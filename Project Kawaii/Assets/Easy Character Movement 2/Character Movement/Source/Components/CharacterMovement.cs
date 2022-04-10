@@ -1600,9 +1600,12 @@ namespace EasyCharacterMovement
                 _capsuleCollider = GetComponent<CapsuleCollider>();
 #endif
 
-            _capsuleCollider.radius = _radius;
-            _capsuleCollider.height = _height;
-            _capsuleCollider.center = _capsuleCenter;
+            if (_capsuleCollider)
+            {
+                _capsuleCollider.radius = _radius;
+                _capsuleCollider.height = _height;
+                _capsuleCollider.center = _capsuleCenter;
+            }
         }
 
         /// <summary>
@@ -1621,8 +1624,11 @@ namespace EasyCharacterMovement
                 _capsuleCollider = GetComponent<CapsuleCollider>();
 #endif
 
-            _capsuleCollider.height = _height;
-            _capsuleCollider.center = _capsuleCenter;
+            if (_capsuleCollider)
+            {
+                _capsuleCollider.height = _height;
+                _capsuleCollider.center = _capsuleCenter;
+            }
         }
 
         /// <summary>
@@ -1659,7 +1665,9 @@ namespace EasyCharacterMovement
                 case PlaneConstraint.None:
                     {
                         _constraintPlaneNormal = Vector3.zero;
-                        rigidbody.constraints = RigidbodyConstraints.None;
+
+                        if (_rigidbody)
+                            _rigidbody.constraints = RigidbodyConstraints.None;
 
                         break;
                     }
@@ -1667,7 +1675,9 @@ namespace EasyCharacterMovement
                 case PlaneConstraint.ConstrainXAxis:
                     {
                         _constraintPlaneNormal = Vector3.right;
-                        rigidbody.constraints = RigidbodyConstraints.FreezePositionX;
+
+                        if (_rigidbody)
+                            _rigidbody.constraints = RigidbodyConstraints.FreezePositionX;
 
                         break;
                     }
@@ -1675,7 +1685,9 @@ namespace EasyCharacterMovement
                 case PlaneConstraint.ConstrainYAxis:
                     {
                         _constraintPlaneNormal = Vector3.up;
-                        rigidbody.constraints = RigidbodyConstraints.FreezePositionY;
+
+                        if (_rigidbody)
+                            _rigidbody.constraints = RigidbodyConstraints.FreezePositionY;
 
                         break;
                     }
@@ -1683,7 +1695,9 @@ namespace EasyCharacterMovement
                 case PlaneConstraint.ConstrainZAxis:
                     {
                         _constraintPlaneNormal = Vector3.forward;
-                        rigidbody.constraints = RigidbodyConstraints.FreezePositionZ;
+
+                        if (_rigidbody)
+                            _rigidbody.constraints = RigidbodyConstraints.FreezePositionZ;
 
                         break;
                     }
@@ -1691,7 +1705,9 @@ namespace EasyCharacterMovement
                 case PlaneConstraint.Custom:
                     {
                         _constraintPlaneNormal = planeNormal;
-                        rigidbody.constraints = RigidbodyConstraints.None;
+
+                        if (_rigidbody)
+                            _rigidbody.constraints = RigidbodyConstraints.None;
 
                         break;
                     }

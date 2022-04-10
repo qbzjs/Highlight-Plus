@@ -166,7 +166,7 @@ namespace EasyCharacterMovement
         /// <summary>
         /// Called after MovementMode has changed.
         /// Does special handling for starting certain modes, eg: enable / disable ground constraint, etc.
-        /// If overriden, must call base.OnMovementModeChanged.
+        /// If overridden, must call base.OnMovementModeChanged.
         /// </summary>
 
         protected override void OnMovementModeChanged(MovementMode prevMovementMode, int prevCustomMode)
@@ -395,7 +395,7 @@ namespace EasyCharacterMovement
         
         /// <summary>
         /// Our Reset method. Set this default values.
-        /// If overriden, must call base method in order to fully initialize the class.
+        /// If overridden, must call base method in order to fully initialize the class.
         /// </summary>
 
         protected override void OnReset()
@@ -414,7 +414,7 @@ namespace EasyCharacterMovement
 
         /// <summary>
         /// Our OnValidate method.
-        /// If overriden, must call base method in order to fully initialize the class.
+        /// If overridden, must call base method in order to fully initialize the class.
         /// </summary>
 
         protected override void OnOnValidate()
@@ -431,7 +431,7 @@ namespace EasyCharacterMovement
 
         /// <summary>
         /// Called when the script instance is being loaded (Awake).
-        /// If overriden, must call base method in order to fully initialize the class.
+        /// If overridden, must call base method in order to fully initialize the class.
         /// </summary>
 
         protected override void OnAwake()

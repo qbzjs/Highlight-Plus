@@ -1,7 +1,19 @@
 Character Movement
 ------------------
 
+VERSION 1.0.4
+
+	- Fixed a bug with SetDimensions and SetHeight functions not updating Collider size in editor.
+
+
+
 VERSION 1.0.3
+
+	- Minor bug fix.
+
+
+
+VERSION 1.0.2
 
 	- Added Assembly Definition.
 	

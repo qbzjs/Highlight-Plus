@@ -1842,7 +1842,7 @@ namespace EasyCharacterMovement
         /// <summary>
         /// Called after MovementMode has changed.
         /// Does special handling for starting certain modes, eg: enable / disable ground constraint, etc.
-        /// If overriden, must call base.OnMovementModeChanged.
+        /// If overridden, must call base.OnMovementModeChanged.
         /// </summary>
 
         protected virtual void OnMovementModeChanged(MovementMode prevMovementMode, int prevCustomMode)
@@ -3265,7 +3265,7 @@ namespace EasyCharacterMovement
 
         /// <summary>
         /// Our Reset method. Set this default values.
-        /// If overriden, must call base method in order to fully initialize the class.
+        /// If overridden, must call base method in order to fully initialize the class.
         /// </summary>
 
         protected virtual void OnReset()
@@ -3336,7 +3336,7 @@ namespace EasyCharacterMovement
 
         /// <summary>
         /// Our OnValidate method.
-        /// If overriden, must call base method in order to fully initialize the class.
+        /// If overridden, must call base method in order to fully initialize the class.
         /// </summary>
 
         protected virtual void OnOnValidate()
@@ -3393,7 +3393,7 @@ namespace EasyCharacterMovement
 
         /// <summary>
         /// Called when the script instance is being loaded (Awake).
-        /// If overriden, must call base method in order to fully initialize the class.
+        /// If overridden, must call base method in order to fully initialize the class.
         /// </summary>
 
         protected virtual void OnAwake()
@@ -3412,7 +3412,7 @@ namespace EasyCharacterMovement
 
         /// <summary>
         /// Our OnEnable method.
-        /// If overriden, must call base method in order to fully initialize the class.
+        /// If overridden, must call base method in order to fully initialize the class.
         /// </summary>
 
         protected virtual void OnOnEnable()
@@ -3444,7 +3444,7 @@ namespace EasyCharacterMovement
 
         /// <summary>
         /// Called when the behaviour becomes disabled (OnDisable).
-        /// If overriden, must call base method in order to fully de-initialize the class.
+        /// If overridden, must call base method in order to fully de-initialize the class.
         /// </summary>
 
         protected virtual void OnOnDisable()
@@ -3466,7 +3466,7 @@ namespace EasyCharacterMovement
 
         /// <summary>
         /// Called on the frame when a script is enabled just before any of the Update methods are called the first time (Start).
-        /// If overriden, must call base method in order to fully initialize the class.
+        /// If overridden, must call base method in order to fully initialize the class.
         /// </summary>
 
         protected virtual void OnStart()

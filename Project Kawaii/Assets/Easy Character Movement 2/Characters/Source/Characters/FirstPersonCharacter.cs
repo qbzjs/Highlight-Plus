@@ -433,7 +433,7 @@ namespace EasyCharacterMovement
 
         /// <summary>
         /// Set this default values.
-        /// If overriden, must call base method in order to fully initialize the class.
+        /// If overridden, must call base method in order to fully initialize the class.
         /// </summary>
 
         protected override void OnReset()
@@ -456,7 +456,7 @@ namespace EasyCharacterMovement
 
         /// <summary>
         /// Validate editor exposed fields. 
-        /// If overriden, must call base method in order to fully initialize the class.
+        /// If overridden, must call base method in order to fully initialize the class.
         /// </summary>
 
         protected override void OnOnValidate()
