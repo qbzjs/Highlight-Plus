@@ -3522,47 +3522,47 @@ namespace EasyCharacterMovement
 
         #region MONOBEHAVIOR
 
-        public void Reset()
+        protected virtual void Reset()
         {
             OnReset();
         }
 
-        public void OnValidate()
+        protected virtual void OnValidate()
         {
             OnOnValidate();
         }
 
-        public void Awake()
+        protected virtual void Awake()
         {
             OnAwake();
         }
 
-        public void OnEnable()
+        protected virtual void OnEnable()
         {
             OnOnEnable();
         }
 
-        public void OnDisable()
+        protected virtual void OnDisable()
         {
             OnOnDisable();
         }
 
-        public void Start()
+        protected virtual void Start()
         {
             OnStart();
         }
 
-        public void FixedUpdate()
+        protected virtual void FixedUpdate()
         {
             OnFixedUpdate();
         }
 
-        public void OnTriggerEnter(Collider other)
+        protected virtual void OnTriggerEnter(Collider other)
         {
             AddPhysicsVolume(other);
         }
 
-        public void OnTriggerExit(Collider other)
+        protected virtual void OnTriggerExit(Collider other)
         {
             RemovePhysicsVolume(other);
         }
@@ -3579,12 +3579,12 @@ namespace EasyCharacterMovement
             }
         }
 
-        public void Update()
+        protected virtual void Update()
         {
             OnUpdate();
         }
 
-        public void LateUpdate()
+        protected virtual void LateUpdate()
         {
             OnLateUpdate();
         }
