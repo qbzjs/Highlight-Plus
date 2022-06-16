@@ -1,6 +1,6 @@
 Shader "HighlightPlus/Geometry/Glow" {
 Properties {
-    _MainTex ("Texture", 2D) = "white" {}
+    _MainTex ("Texture", Any) = "white" {}
     _Glow2 ("Glow2", Vector) = (0.01, 1, 0.5, 0)
     _Color ("Color", Color) = (1,1,1) // not used; dummy property to avoid inspector warning "material has no _Color property"
     _Cull ("Cull Mode", Int) = 2
@@ -8,6 +8,7 @@ Properties {
 	_GlowZTest ("ZTest", Int) = 4
     _GlowStencilOp ("Stencil Operation", Int) = 0
     _CutOff("CutOff", Float ) = 0.5
+    _GlowStencilComp ("Stencil Comp", Int) = 6
 }
     SubShader
     {
@@ -18,7 +19,7 @@ Properties {
         {
         	Stencil {
                 Ref 2
-                Comp NotEqual
+                Comp [_GlowStencilComp]
                 Pass [_GlowStencilOp]
                 ReadMask 2
                 WriteMask 2

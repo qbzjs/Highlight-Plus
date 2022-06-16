@@ -52,7 +52,16 @@ MonoBehaviour:
     linkText: 
     url: 
   - heading: 
-    text:
+    text: 
     linkText: 
     url: 
+  - heading: NOTE
+    text: This update (v1.2.1) adds networking examples for major Unity networking solutions (Photon Fusion, FishNet and Mirror) to the Character Movement package.
+    linkText: 
+    url: 
+  - heading: 
+    text: The full ECM2 networking update (i.e Character based development) is still in develepoment as it requires additional data sync and further tests.
+    linkText: 
+    url: 
+  
   loadedLayout: 1

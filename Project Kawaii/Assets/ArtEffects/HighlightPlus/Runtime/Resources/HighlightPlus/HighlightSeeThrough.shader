@@ -1,6 +1,6 @@
 Shader "HighlightPlus/Geometry/SeeThrough" {
 Properties {
-    _MainTex ("Texture", 2D) = "white" {}
+    _MainTex ("Texture", Any) = "white" {}
     _SeeThrough ("See Through", Range(0,1)) = 0.8
     _SeeThroughTintColor ("See Through Tint Color", Color) = (1,0,0,0.8)
 		_SeeThroughNoise("Noise", Float) = 1

@@ -62,7 +62,7 @@ namespace HighlightPlus {
                 int camLayer = 1 << cam.gameObject.layer;
 
                 RenderTargetIdentifier cameraColorTarget = renderer.cameraColorTarget;
-                RenderTargetIdentifier cameraDepthTarget = renderer.cameraDepth;
+                RenderTargetIdentifier cameraDepthTarget = renderer.cameraDepthTarget;
 #if !UNITY_2021_2_OR_NEWER
 // In Unity 2021.2, when MSAA > 1, cameraDepthTarget is no longer cameraColorTarget
                 if (!usesCameraOverlay && (cameraTextureDescriptor.msaaSamples > 1 || cam.cameraType == CameraType.SceneView)) {

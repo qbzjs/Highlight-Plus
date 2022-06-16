@@ -230,7 +230,12 @@ namespace HighlightPlus {
         public bool glowBlitDebug;
         [Tooltip("Blends glow passes one after another. If this option is disabled, glow passes won't overlap (in this case, make sure the glow pass 1 has a smaller offset than pass 2, etc.)")]
         public bool glowBlendPasses = true;
+#if UNITY_2020_2_OR_NEWER
+        [NonReorderable]
+#endif
         public GlowPassData[] glowPasses;
+        [Tooltip("If enabled, glow effect will not use a stencil mask. This can be used to render the glow effect alone.")]
+        public bool glowIgnoreMask;
 
         [Range(0, 5f)]
         [Tooltip("The intensity of the inner glow effect. A value of 0 disables the glow completely.")]
@@ -1400,6 +1405,7 @@ namespace HighlightPlus {
                 fxMatComposeGlow.SetVector(ShaderParams.Flip, (UnityEngine.XR.XRSettings.enabled && flipY) ? new Vector4(1, -1) : new Vector4(0, 1));
                 fxMatComposeGlow.SetInt(ShaderParams.ZTest, GetZTestValue(smoothGlowVisibility));
                 fxMatComposeGlow.SetColor(ShaderParams.Debug, glowBlitDebug ? debugColor : blackColor);
+                fxMatComposeGlow.SetInt(ShaderParams.GlowStencilComp, glowIgnoreMask ? (int)CompareFunction.Always : (int)CompareFunction.NotEqual);
                 cbHighlight.DrawMesh(quadMesh, quadGlowMatrix, fxMatComposeGlow, 0, 0);
             }
             bool renderSmoothOutline = outline > 0 && outlineQuality == QualityLevel.Highest;
@@ -1786,7 +1792,7 @@ namespace HighlightPlus {
                 _highlighted = false;
             }
 
-            maskRequired = (_highlighted && (outline > 0 || glow > 0)) || seeThrough != SeeThroughMode.Never || (targetFX && targetFXAlignToGround);
+            maskRequired = (_highlighted && (outline > 0 || (glow > 0 && !glowIgnoreMask))) || seeThrough != SeeThroughMode.Never || (targetFX && targetFXAlignToGround);
 
             Color seeThroughTintColor = this.seeThroughTintColor;
             seeThroughTintColor.a = this.seeThroughTintAlpha;
@@ -1965,6 +1971,8 @@ namespace HighlightPlus {
                             fxMat.SetInt(ShaderParams.Cull, cullBackFaces ? (int)CullMode.Back : (int)CullMode.Off);
                             fxMat.SetFloat(ShaderParams.ConstantWidth, constantWidth ? 1.0f : 0);
                             fxMat.SetInt(ShaderParams.GlowStencilOp, glowBlendPasses ? (int)StencilOp.Keep : (int)StencilOp.Replace);
+				            fxMat.SetInt(ShaderParams.GlowStencilComp, glowIgnoreMask ? (int)CompareFunction.Always : (int)CompareFunction.NotEqual);
+
                             if (useAlphaTest) {
                                 fxMat.mainTexture = matTexture;
                                 fxMat.mainTextureOffset = matTextureOffset;

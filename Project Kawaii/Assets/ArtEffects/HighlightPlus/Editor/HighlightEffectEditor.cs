@@ -18,7 +18,7 @@ namespace HighlightPlus {
         SerializedProperty overlay, overlayColor, overlayAnimationSpeed, overlayMinIntensity, overlayBlending, overlayTexture, overlayTextureScale;
         SerializedProperty outline, outlineColor, outlineWidth, outlineQuality, outlineDownsampling, outlineVisibility, outlineBlitDebug, outlineIndependent;
         SerializedProperty glow, glowWidth, glowQuality, glowDownsampling, glowHQColor, glowDithering, glowMagicNumber1, glowMagicNumber2, glowAnimationSpeed;
-        SerializedProperty glowBlendPasses, glowPasses, glowVisibility, glowBlendMode, glowBlitDebug;
+        SerializedProperty glowBlendPasses, glowPasses, glowVisibility, glowBlendMode, glowBlitDebug, glowIgnoreMask;
         SerializedProperty innerGlow, innerGlowWidth, innerGlowColor, innerGlowVisibility;
         SerializedProperty seeThrough, seeThroughOccluderMask, seeThroughOccluderMaskAccurate, seeThroughOccluderThreshold, seeThroughOccluderCheckInterval, seeThroughOccluderCheckIndividualObjects, seeThroughDepthOffset, seeThroughMaxDepth;
         SerializedProperty seeThroughIntensity, seeThroughTintAlpha, seeThroughTintColor, seeThroughNoise, seeThroughBorder, seeThroughBorderWidth, seeThroughBorderColor, seeThroughOrdered;
@@ -89,6 +89,7 @@ namespace HighlightPlus {
             glowVisibility = serializedObject.FindProperty("glowVisibility");
             glowBlendMode = serializedObject.FindProperty("glowBlendMode");
             glowBlitDebug = serializedObject.FindProperty("glowBlitDebug");
+			glowIgnoreMask = serializedObject.FindProperty("glowIgnoreMask");
             glowDownsampling = serializedObject.FindProperty("glowDownsampling");
             innerGlow = serializedObject.FindProperty("innerGlow");
             innerGlowColor = serializedObject.FindProperty("innerGlowColor");
@@ -386,6 +387,7 @@ namespace HighlightPlus {
                         }
                         EditorGUILayout.PropertyField(glowPasses, true);
                     }
+                    EditorGUILayout.PropertyField(glowIgnoreMask, new GUIContent("Ignore Mask"));
                     EditorGUI.indentLevel--;
                 }
                 EditorGUILayout.EndVertical();

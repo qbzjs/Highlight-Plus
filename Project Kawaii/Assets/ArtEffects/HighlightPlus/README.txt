@@ -89,6 +89,11 @@ Version history
 ---------------
 
 Current version
+- Added "Ignore Mask" option to glow. Can be used to render the glow effect alone
+- [Fix] Fixed issue with new input system and highlight manager/trigger if no Event System is present in the scene
+- [Fix] Fixed glow passes UI overlap in Unity 2021.3.3 due to reorderable array bug
+
+Version 8.1
 - Selection state is now visible in inspector (used only by trigger and manager components)
 - [Fix] Fixed outer glow not showing in higher quality with visibility set to normal and orthographic camera
 - [Fix] Fixed mobile input using the new input system

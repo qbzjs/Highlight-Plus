@@ -95,6 +95,9 @@ namespace HighlightPlus {
 #if ENABLE_INPUT_SYSTEM
             if (respectUI) {
                 EventSystem es = EventSystem.current;
+                if (es == null) {
+                    es = CreateEventSystem();
+                }
                 List<RaycastResult> raycastResults = new List<RaycastResult>();
                 PointerEventData eventData = new PointerEventData(es);
                 Vector3 cameraPos = raycastCamera.transform.position;
@@ -189,6 +192,15 @@ namespace HighlightPlus {
             }
             SwitchesCollider (null);
 		}
+
+
+#if ENABLE_INPUT_SYSTEM
+        EventSystem CreateEventSystem() {
+            GameObject eo = new GameObject("Event System created by Highlight Plus", typeof(EventSystem), typeof(UnityEngine.InputSystem.UI.InputSystemUIInputModule));
+            return eo.GetComponent<EventSystem>();
+        }
+#endif
+
 
 		void SwitchesCollider (Transform newObject) {
             if (currentEffect != null) {

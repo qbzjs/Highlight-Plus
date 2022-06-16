@@ -1,6 +1,6 @@
 ﻿Shader "HighlightPlus/Geometry/Outline" {
 Properties {
-    _MainTex ("Texture", 2D) = "white" {}
+    _MainTex ("Texture", Any) = "white" {}
     _OutlineWidth ("Outline Offset", Float) = 0.01
     _Color ("Color", Color) = (1,1,1) // not used; dummy property to avoid inspector warning "material has no _Color property"
     _Cull ("Cull Mode", Int) = 2

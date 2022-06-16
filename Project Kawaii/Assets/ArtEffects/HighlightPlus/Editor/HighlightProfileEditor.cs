@@ -12,7 +12,7 @@ namespace HighlightPlus {
         SerializedProperty fadeInDuration, fadeOutDuration, constantWidth, normalsOption;
         SerializedProperty outline, outlineColor, outlineWidth, outlineQuality, outlineDownsampling, outlineVisibility, outlineIndependent;
         SerializedProperty glow, glowWidth, glowQuality, glowDownsampling, glowHQColor, glowDithering, glowMagicNumber1, glowMagicNumber2, glowAnimationSpeed;
-        SerializedProperty glowBlendPasses, glowVisibility, glowBlendMode, glowPasses;
+        SerializedProperty glowBlendPasses, glowVisibility, glowBlendMode, glowPasses, glowIgnoreMask;
         SerializedProperty innerGlow, innerGlowWidth, innerGlowColor, innerGlowVisibility;
         SerializedProperty targetFX, targetFXTexture, targetFXColor, targetFXRotationSpeed, targetFXInitialScale, targetFXEndScale, targetFXScaleToRenderBound;
         SerializedProperty targetFXAlignToGround, targetFXFadePower, targetFXGroundMaxDistance, targetFXGroundLayerMask, targetFXScaleToRenderBounds, targetFXTransitionDuration, targetFXStayDuration, targetFXVisibility;
@@ -59,6 +59,7 @@ namespace HighlightPlus {
             glowVisibility = serializedObject.FindProperty("glowVisibility");
             glowBlendMode = serializedObject.FindProperty("glowBlendMode");
             glowPasses = serializedObject.FindProperty("glowPasses");
+            glowIgnoreMask = serializedObject.FindProperty("glowIgnoreMask");
             innerGlow = serializedObject.FindProperty("innerGlow");
             innerGlowColor = serializedObject.FindProperty("innerGlowColor");
             innerGlowWidth = serializedObject.FindProperty("innerGlowWidth");
@@ -171,6 +172,7 @@ namespace HighlightPlus {
                     }
                     EditorGUILayout.PropertyField(glowBlendPasses, new GUIContent("Blend Passes"));
                     EditorGUILayout.PropertyField(glowPasses, true);
+                    EditorGUILayout.PropertyField(glowIgnoreMask, new GUIContent("Ignore Mask"));
                 }
                 EditorGUI.indentLevel--;
             }

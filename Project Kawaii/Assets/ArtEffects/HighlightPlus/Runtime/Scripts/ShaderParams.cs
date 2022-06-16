@@ -29,6 +29,7 @@ namespace HighlightPlus {
 
         // glow uniforms
         public static int GlowZTest = Shader.PropertyToID("_GlowZTest");
+        public static int GlowStencilComp = Shader.PropertyToID("_GlowStencilComp");
         public static int GlowStencilOp = Shader.PropertyToID("_GlowStencilOp");
         public static int GlowDirection = Shader.PropertyToID("_GlowDirection");
         public static int Glow = Shader.PropertyToID("_Glow");

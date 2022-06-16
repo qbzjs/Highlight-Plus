@@ -86,6 +86,8 @@ namespace HighlightPlus {
         [Tooltip("Blends glow passes one after another. If this option is disabled, glow passes won't overlap (in this case, make sure the glow pass 1 has a smaller offset than pass 2, etc.)")]
         public bool glowBlendPasses = true;
         public GlowPassData[] glowPasses;
+        [Tooltip("If enabled, glow effect will not use a stencil mask. This can be used to render the glow effect alone.")]
+        public bool glowIgnoreMask;
 
         [Range(0, 5f)]
         [Tooltip("The intensity of the inner glow effect. A value of 0 disables the glow completely.")]
@@ -185,6 +187,7 @@ namespace HighlightPlus {
             effect.glowBlendMode = glowBlendMode;
             effect.glowBlendPasses = glowBlendPasses;
             effect.glowPasses = GetGlowPassesCopy(glowPasses);
+            effect.glowIgnoreMask = glowIgnoreMask;
             effect.innerGlow = innerGlow;
             effect.innerGlowWidth = innerGlowWidth;
             effect.innerGlowColor = innerGlowColor;
@@ -265,6 +268,7 @@ namespace HighlightPlus {
             glowBlendMode = effect.glowBlendMode;
             glowBlendPasses = effect.glowBlendPasses;
             glowPasses = GetGlowPassesCopy(effect.glowPasses);
+            glowIgnoreMask = effect.glowIgnoreMask;
             innerGlow = effect.innerGlow;
             innerGlowWidth = effect.innerGlowWidth;
             innerGlowColor = effect.innerGlowColor;
