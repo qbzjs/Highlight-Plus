@@ -13,9 +13,9 @@ public class SettingsManager : MonoBehaviour
     [SerializeField]
     private Toggle fsToggle;
     [SerializeField]
-    private Profiles settingsProfile;
+    private SettingsProfile settingsProfile;
 
-    public static Profiles profile { get; private set; }
+    public static SettingsProfile profile { get; private set; }
 
     private void Awake()
     {

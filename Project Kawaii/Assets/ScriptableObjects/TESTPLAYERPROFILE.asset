@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c54cc66dc990a5946bac1c7b0ab04328, type: 3}
+  m_Name: TESTPLAYERPROFILE
+  m_EditorClassIdentifier: 
+  saveInPlayerPrefs: 1
+  prefPrefix: Player_
+  name: Mikel
+  raceInt: 1
+  skinInt: 7
+  faceInt: 2
+  headAccessory: 0
+  chestAccessory: 0
+  handAccessory: 0

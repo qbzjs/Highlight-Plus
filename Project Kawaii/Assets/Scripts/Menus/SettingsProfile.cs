@@ -18,7 +18,7 @@ public class Volume
 
 #region Profile ScriptableObject
 [CreateAssetMenu(menuName = "MikelW/Create Settings Profile")]
-public class Profiles : ScriptableObject
+public class SettingsProfile : ScriptableObject
 {
     #region Variables
     [Header("Base Save Settings")]

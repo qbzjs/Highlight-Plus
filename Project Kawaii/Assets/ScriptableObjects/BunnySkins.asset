@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78f1ee6e31dc3c341bfb6c9c8fd7d885, type: 3}
+  m_Name: BunnySkins
+  m_EditorClassIdentifier: 
+  materialList:
+  - {fileID: 2100000, guid: 40018d188bbbc424fb5f91ac90a9ff57, type: 2}
+  - {fileID: 2100000, guid: 63685f439044e2f44a3b0f4300ff4de4, type: 2}
+  - {fileID: 2100000, guid: 4fb38f233f665394a8308143832c2dc2, type: 2}
+  - {fileID: 2100000, guid: b7b0724527ac2c448b5e2ba718ffbf4b, type: 2}
+  - {fileID: 2100000, guid: 65fce5873112a56479b80a1bdf7f1df4, type: 2}
+  - {fileID: 2100000, guid: 20c0f650cbd7be3439478b735fb08947, type: 2}
+  - {fileID: 2100000, guid: 7676fc0c92a53f44686036a80da2aa84, type: 2}
+  - {fileID: 2100000, guid: 1f145536eb04cf34bb5b66defddd81d1, type: 2}
+  - {fileID: 2100000, guid: 11c209555f39bdd4abcec67309459c69, type: 2}
+  - {fileID: 2100000, guid: 472aba46712458c4e87868e7aa6ef6b9, type: 2}
+  - {fileID: 2100000, guid: a5e19b647bcdb4f469bf4ec219345dd1, type: 2}
+  - {fileID: 2100000, guid: 5190a7425cc86ad48982bca990b5493d, type: 2}
+  - {fileID: 2100000, guid: da220719f853f5c41b8d2cd20201a493, type: 2}
+  - {fileID: 2100000, guid: 7319a1234c5731d40a8516d9848c4bc0, type: 2}
+  - {fileID: 2100000, guid: ce4d680776075a849a51b577293d9cfd, type: 2}

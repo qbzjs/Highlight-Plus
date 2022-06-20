@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78f1ee6e31dc3c341bfb6c9c8fd7d885, type: 3}
+  m_Name: CatSkins
+  m_EditorClassIdentifier: 
+  materialList:
+  - {fileID: 2100000, guid: fda27def7d845f34dbd2e4692c8f45fa, type: 2}
+  - {fileID: 2100000, guid: 91c6c5971a804b046a9d82df541da843, type: 2}
+  - {fileID: 2100000, guid: 217f9b1d9e0aea3418c1705493cbe83c, type: 2}
+  - {fileID: 2100000, guid: 3b0e905371dc2b4409b4bf2fbeb56f14, type: 2}
+  - {fileID: 2100000, guid: 907771041a6d9ae488940e66f95e641b, type: 2}
+  - {fileID: 2100000, guid: 41b4531de298363479f0a35d26cce2df, type: 2}
+  - {fileID: 2100000, guid: e7495c76641c57a438b23cd7c2ec3e9d, type: 2}
+  - {fileID: 2100000, guid: f2c81089fd959424f9cfea71dffd9d0f, type: 2}
+  - {fileID: 2100000, guid: b97563860dc40d34e9c574d5169a13fb, type: 2}
+  - {fileID: 2100000, guid: 0ec7a43084bdcd64fb8d8d53290c397d, type: 2}
+  - {fileID: 2100000, guid: e4c543b556f611b489a291f5c946c035, type: 2}
+  - {fileID: 2100000, guid: 5682b2170796c90469513d96dc54d28d, type: 2}
+  - {fileID: 2100000, guid: c0b5fc80280df9f46874fc25ae10a155, type: 2}
+  - {fileID: 2100000, guid: 680e246a55ecf3a45b53f04c5a39559a, type: 2}
+  - {fileID: 2100000, guid: 745598a9fd990a546a05c3d7589a59d0, type: 2}
