@@ -11,7 +11,7 @@ public class PlayerProfile : ScriptableObject
 
     [Header("Player Settings")]
     [SerializeField]
-    private string name = "Mikel";
+    private string charName = "Mikel";
     [SerializeField]
     private int raceInt = 2;
     [SerializeField]
@@ -30,7 +30,7 @@ public class PlayerProfile : ScriptableObject
         if (saveInPlayerPrefs)
             PlayerPrefs.SetString(prefPrefix + "Name", savedName);
 
-        name = savedName;
+        charName = savedName;
     }
 
     public string LoadNameString()
@@ -42,7 +42,7 @@ public class PlayerProfile : ScriptableObject
         }
         else
         {
-            return name;
+            return charName;
         }
     }
 
@@ -109,6 +109,72 @@ public class PlayerProfile : ScriptableObject
         else
         {
             return faceInt;
+        }
+    }
+
+    public void SaveHeadAccessoryInt(int savedHeadAccessoryInt)
+    {
+        if (saveInPlayerPrefs)
+            PlayerPrefs.SetInt(prefPrefix + "Head_Accessory", savedHeadAccessoryInt);
+
+        headAccessory = savedHeadAccessoryInt;
+    }
+
+
+    public int LoadHeadAccessoryInt()
+    {
+        if (saveInPlayerPrefs && PlayerPrefs.HasKey(prefPrefix + "Head_Accessory"))
+        {
+            int loadedIndex = PlayerPrefs.GetInt(prefPrefix + "Head_Accessory");
+            return loadedIndex;
+        }
+        else
+        {
+            return headAccessory;
+        }
+    }
+
+    public void SaveChestAccessoryInt(int savedChestAccessoryInt)
+    {
+        if (saveInPlayerPrefs)
+            PlayerPrefs.SetInt(prefPrefix + "Chest_Accessory", savedChestAccessoryInt);
+
+        chestAccessory = savedChestAccessoryInt;
+    }
+
+
+    public int LoadChestAccessoryInt()
+    {
+        if (saveInPlayerPrefs && PlayerPrefs.HasKey(prefPrefix + "Chest_Accessory"))
+        {
+            int loadedIndex = PlayerPrefs.GetInt(prefPrefix + "Chest_Accessory");
+            return loadedIndex;
+        }
+        else
+        {
+            return chestAccessory;
+        }
+    }
+
+    public void SaveHandAccessoryInt(int savedHandAccessoryInt)
+    {
+        if (saveInPlayerPrefs)
+            PlayerPrefs.SetInt(prefPrefix + "Hand_Accessory", savedHandAccessoryInt);
+
+        handAccessory = savedHandAccessoryInt;
+    }
+
+
+    public int LoadHandAccessoryInt()
+    {
+        if (saveInPlayerPrefs && PlayerPrefs.HasKey(prefPrefix + "Hand_Accessory"))
+        {
+            int loadedIndex = PlayerPrefs.GetInt(prefPrefix + "Hand_Accessory");
+            return loadedIndex;
+        }
+        else
+        {
+            return handAccessory;
         }
     }
 }

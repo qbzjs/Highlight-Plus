@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   saveInPlayerPrefs: 1
   prefPrefix: Player_
-  name: Mikel
-  raceInt: 1
-  skinInt: 7
-  faceInt: 2
-  headAccessory: 0
-  chestAccessory: 0
-  handAccessory: 0
+  charName: Mikel
+  raceInt: 2
+  skinInt: 5
+  faceInt: 8
+  headAccessory: 5
+  chestAccessory: 8
+  handAccessory: 6
