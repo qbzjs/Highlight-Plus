@@ -17,6 +17,9 @@ public class Volume
 #endregion Volume Class
 
 #region Profile ScriptableObject
+/// <summary>
+/// Profile to contain players settings such as volume or fullscreen
+/// </summary>
 [CreateAssetMenu(menuName = "MikelW/Create Settings Profile")]
 public class SettingsProfile : ScriptableObject
 {

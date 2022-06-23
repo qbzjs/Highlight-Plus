@@ -1,15 +1,18 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "MikelW/Create Player Profile")]
-public class PlayerProfile : ScriptableObject
+/// <summary>
+/// Profile to contain a characters customization settings, can be used for NPCs
+/// </summary>
+[CreateAssetMenu(menuName = "MikelW/Create Character Profile")]
+public class CharacterProfile : ScriptableObject
 {
     [Header("Base Save Settings")]
     [SerializeField]
     private bool saveInPlayerPrefs = true;
     [SerializeField]
-    private string prefPrefix = "Player_";
+    private string prefPrefix = "Character_";
 
-    [Header("Player Settings")]
+    [Header("Character Settings")]
     [SerializeField]
     private string charName = "Mikel";
     [SerializeField]

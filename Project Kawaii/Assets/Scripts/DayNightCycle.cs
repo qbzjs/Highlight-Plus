@@ -5,9 +5,12 @@ using UnityEngine.UI;
 
 public class DayNightCycle : MonoBehaviour
 {
+    #region Variables
     //Seconds in real time for 10 minutes in game time
     public float tenMinuteRealTime = 10;
     public bool countTime = true;
+
+    public PlayerProfile playerProfile;
 
     [SerializeField]
     private int startTime = 8;
@@ -28,9 +31,17 @@ public class DayNightCycle : MonoBehaviour
     [SerializeField]
     private Image sunImage;
 
+
+    [Header("PRIVATE SETTINGS FOR DEBUGGING ONLY")]
+    [SerializeField]
+    private int currentDay;
+    [SerializeField]
     private int currentHour;
+    [SerializeField]
     private int currentMinute;
+    [SerializeField]
     private float timePercent;
+    [SerializeField]
     private float timeCount;
 
     public UnityEvent onMinuteChanged;
@@ -39,26 +50,27 @@ public class DayNightCycle : MonoBehaviour
     public UnityEvent onDusk;
     public UnityEvent onDayStart;
     public UnityEvent onDayEnd;
+    #endregion Variables
 
-    private void Start()
+    #region Unity Methods
+    private void Awake()
     {
-        currentHour = startTime;
-        onMinuteChanged.AddListener(UpdateSunUIColor);
-        onMinuteChanged.AddListener(UpdateTimeText);
-        onDayStart.Invoke();
+        onMinuteChanged.AddListener(UpdateTimeUI);
+        onDayEnd.AddListener(EndDay);
     }
 
     private void Update()
     {
-        CalculateTime();
+        if(countTime)
+            CalculateTime();
     }
+    #endregion Unity Methods
 
+    #region Private Methods
     private void CalculateTime()
     {
         timePercent = (currentHour - startTime) / (endTime - startTime) + currentMinute / 600;
-
-        if (countTime)
-            timeCount += Time.deltaTime;
+        timeCount += Time.deltaTime;
 
         if (timeCount >= tenMinuteRealTime)
         {
@@ -89,28 +101,52 @@ public class DayNightCycle : MonoBehaviour
         }
     }
 
-    private void UpdateSunUIColor()
+    private void UpdateTimeUI()
     {
         sunImage.color = Color.Lerp(Color.white, sunUINightColor, timePercent);
-    }
 
-    private void UpdateTimeText()
-    {
-        if(currentHour < 13)
+        if (currentHour < 13)
             timeText.text = currentHour + ":" + currentMinute;
         else 
             timeText.text = (currentHour - 12) + ":" + currentMinute;
 
         if (currentMinute == 0)
             timeText.text += "0";
+
         if (currentHour < 12)
             timeText.text += " AM";
         else
             timeText.text += " PM";
     }
+    #endregion Private Methods
 
-    private void UpdateDayText()
+    #region Public Methods
+    public void StartDay()
     {
+        //Initialize game day, load game here
+        if (playerProfile)
+        {
+            Debug.Log("Loaded day");
+            currentDay = playerProfile.LoadDayInt();
+        }
 
+        currentDay += 1;
+        dayText.text = "Day " + currentDay;
+        currentHour = startTime;
+        currentMinute = 0;
+        timePercent = 0;
+        timeCount = 0;
+        UpdateTimeUI();
+        countTime = true;
+
+        onDayStart.Invoke();
     }
+
+    public void EndDay()
+    {
+        //Force player to bed, progress day, save game here
+        countTime = false;
+        playerProfile.SaveDayInt(currentDay);
+    }
+    #endregion Public Methods
 }

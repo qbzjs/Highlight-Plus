@@ -13,7 +13,7 @@ public class CustomizerManager : MonoBehaviour
     private int chestAccessory = 0;
     private int handAccessory = 0;
 
-    public PlayerProfile playerProfile;
+    public CharacterProfile playerProfile;
     public MaterialLists faces;
     public MaterialLists bearSkins;
     public MaterialLists bunnySkins;
