@@ -4,7 +4,7 @@ public class Fader : MonoBehaviour
 {
     private Animator anim;
 
-    private void Start()
+    private void Awake()
     {
         anim = GetComponent<Animator>();
     }

@@ -22,19 +22,16 @@ public class DayNightCycle : MonoBehaviour
     private int duskTime = 20;
 
     [SerializeField]
-    private Color sunUINightColor;
-
-    [SerializeField]
     private TMP_Text timeText;
     [SerializeField]
     private TMP_Text dayText;
     [SerializeField]
-    private Image sunImage;
+    private Image darknessUIImage;
 
 
     [Header("PRIVATE SETTINGS FOR DEBUGGING ONLY")]
     [SerializeField]
-    private int currentDay;
+    private int currentDay = 1;
     [SerializeField]
     private int currentHour;
     [SerializeField]
@@ -59,9 +56,13 @@ public class DayNightCycle : MonoBehaviour
         onDayEnd.AddListener(EndDay);
     }
 
+    private void Start()
+    {
+        StartDay();
+    }
     private void Update()
     {
-        if(countTime)
+        if (countTime)
             CalculateTime();
     }
     #endregion Unity Methods
@@ -69,7 +70,8 @@ public class DayNightCycle : MonoBehaviour
     #region Private Methods
     private void CalculateTime()
     {
-        timePercent = (currentHour - startTime) / (endTime - startTime) + currentMinute / 600;
+        timePercent = ((currentHour - startTime) + ((float)currentMinute / 60)) / (endTime - startTime);
+        //timePercent = ((float)(currentHour - startTime) / (endTime - startTime)) + ((float)currentMinute / ((endTime - startTime) * 60));
         timeCount += Time.deltaTime;
 
         if (timeCount >= tenMinuteRealTime)
@@ -103,7 +105,9 @@ public class DayNightCycle : MonoBehaviour
 
     private void UpdateTimeUI()
     {
-        sunImage.color = Color.Lerp(Color.white, sunUINightColor, timePercent);
+        Color temp = Color.black;
+        temp.a = Mathf.Lerp(0, 1, timePercent);
+        darknessUIImage.color = temp;
 
         if (currentHour < 13)
             timeText.text = currentHour + ":" + currentMinute;
@@ -123,6 +127,7 @@ public class DayNightCycle : MonoBehaviour
     #region Public Methods
     public void StartDay()
     {
+        Debug.Log("Day Started");
         //Initialize game day, load game here
         if (playerProfile)
         {
