@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using System.Collections;
 using TMPro;
 using UnityEngine.UI;
 
@@ -13,6 +14,8 @@ public class DayNightCycle : MonoBehaviour
     public PlayerProfile playerProfile;
 
     [SerializeField]
+    private float fadeOutDelay = 2;
+    [SerializeField]
     private int startTime = 8;
     [SerializeField]
     private int endTime = 24;
@@ -21,6 +24,8 @@ public class DayNightCycle : MonoBehaviour
     [SerializeField]
     private int duskTime = 20;
 
+    [SerializeField]
+    private GameObject endDayCanvas;
     [SerializeField]
     private TMP_Text timeText;
     [SerializeField]
@@ -60,6 +65,7 @@ public class DayNightCycle : MonoBehaviour
     {
         StartDay();
     }
+
     private void Update()
     {
         if (countTime)
@@ -127,11 +133,10 @@ public class DayNightCycle : MonoBehaviour
     #region Public Methods
     public void StartDay()
     {
-        Debug.Log("Day Started");
+        endDayCanvas.SetActive(false);
         //Initialize game day, load game here
         if (playerProfile)
         {
-            Debug.Log("Loaded day");
             currentDay = playerProfile.LoadDayInt();
         }
 
@@ -152,6 +157,13 @@ public class DayNightCycle : MonoBehaviour
         //Force player to bed, progress day, save game here
         countTime = false;
         playerProfile.SaveDayInt(currentDay);
+        StartCoroutine(FadeOutDelay(fadeOutDelay));
+    }
+
+    IEnumerator FadeOutDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        endDayCanvas.SetActive(true);
     }
     #endregion Public Methods
 }

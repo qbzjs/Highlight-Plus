@@ -11,11 +11,13 @@ public class Fader : MonoBehaviour
 
     public void FadeIn()
     {
-        anim.SetTrigger("In");
+        if (!anim.GetCurrentAnimatorStateInfo(0).IsName("FadeIn"))
+            anim.SetTrigger("In");
     }
 
     public void FadeOut()
     {
-        anim.SetTrigger("Out");
+        if (!anim.GetCurrentAnimatorStateInfo(0).IsName("FadeOut"))
+            anim.SetTrigger("Out");
     }
 }

@@ -6,6 +6,14 @@ using TMPro;
 
 public class MainMenuManager : MonoBehaviour
 {
+    [SerializeField]
+    private CustomizerManager customManager;
+
+    private void Awake()
+    {
+        customManager.LoadCustomization();
+    }
+
     public void NewGame()
     {
         MenuFunctions.LoadScene("LoadingScene");
