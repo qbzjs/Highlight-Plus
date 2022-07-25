@@ -25,11 +25,11 @@ public class DayNightCycle : MonoBehaviour
     private int duskTime = 20;
 
     [SerializeField]
-    private GameObject endDayCanvas;
-    [SerializeField]
     private TMP_Text timeText;
     [SerializeField]
     private TMP_Text dayText;
+    [SerializeField]
+    private TMP_Text endDayText;
     [SerializeField]
     private Image darknessUIImage;
 
@@ -52,6 +52,8 @@ public class DayNightCycle : MonoBehaviour
     public UnityEvent onDusk;
     public UnityEvent onDayStart;
     public UnityEvent onDayEnd;
+    public UnityEvent onDayEndFade;
+
     #endregion Variables
 
     #region Unity Methods
@@ -133,7 +135,6 @@ public class DayNightCycle : MonoBehaviour
     #region Public Methods
     public void StartDay()
     {
-        endDayCanvas.SetActive(false);
         //Initialize game day, load game here
         if (playerProfile)
         {
@@ -157,13 +158,14 @@ public class DayNightCycle : MonoBehaviour
         //Force player to bed, progress day, save game here
         countTime = false;
         playerProfile.SaveDayInt(currentDay);
+        endDayText.text = "Day " + currentDay + " Completed!";
         StartCoroutine(FadeOutDelay(fadeOutDelay));
     }
 
     IEnumerator FadeOutDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
-        endDayCanvas.SetActive(true);
+        onDayEndFade.Invoke();
     }
     #endregion Public Methods
 }
