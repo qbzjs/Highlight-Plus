@@ -49,7 +49,7 @@ public class CustomizerManager : MonoBehaviour
 
     public void SaveCustomization()
     {
-        playerProfile.SaveNameString(name);
+        playerProfile.SaveNameString(charName);
         playerProfile.SaveRaceInt(raceInt);
         playerProfile.SaveSkinInt(skinInt);
         playerProfile.SaveFaceInt(faceInt);

@@ -59,9 +59,9 @@ Help & Support Forum
 Check the Documentation (PDF) for detailed instructions:
 
 Have any question or issue?
-* Email: contact@kronnect.com
 * Support Forum: https://kronnect.com/support
 * Twitter: @Kronnect
+* Email (non support): contact@kronnect.com
 
 If you like Highlight Plus, please rate it on the Asset Store. It encourages us to keep improving it! Thanks!
 
@@ -89,6 +89,25 @@ Version history
 ---------------
 
 Current version
+- Added "Camera Distance Fade" option
+- Improved see-through accurate method which now takes into account multi-part meshes from compound parents
+- [Fix] Fixed glow/outline aspect ratio in Single Pass Instanced VR mode
+
+Version 8.5
+- Improved outline effect when combining "Independent" option with many elements in "Children" selection
+- Improved see-through border only effect
+
+Version 8.4.1
+- [Fix] Fixed unnecessary memory allocation in the render feature
+
+Version 8.4
+- Added "Border Only" option to See-Through effect
+- Adding a Highlight Effect component to a parent no longer deactivates highlighted children
+
+Version 8.3
+- Upgraded to Unity 2020.3.16 as minimum
+
+Version 8.2
 - Added "Ignore Mask" option to glow. Can be used to render the glow effect alone
 - [Fix] Fixed issue with new input system and highlight manager/trigger if no Event System is present in the scene
 - [Fix] Fixed glow passes UI overlap in Unity 2021.3.3 due to reorderable array bug

@@ -70,7 +70,7 @@ namespace HighlightPlus {
         public const string SKW_DEPTHCLIP = "HP_DEPTHCLIP";
         public const string SKW_DEPTH_OFFSET = "HP_DEPTH_OFFSET";
         public const string SKW_USES_OVERLAY_TEXTURE = "HP_USES_OVERLAY_TEXTURE";
-
+        public const string SKW_SEETHROUGH_ONLY_BORDER = "HP_SEETHROUGH_ONLY_BORDER";
     }
 }
 

@@ -66,6 +66,7 @@ Properties {
         // Create mask
         Pass
         {
+            Name "Mask"
 			Stencil {
                 Ref 2
                 Comp always
@@ -89,6 +90,7 @@ Properties {
         // Create mask for see-through (the only difference is the ZTest)
         Pass
         {
+            Name "See-through Mask"
 			Stencil {
                 Ref 2
                 Comp always

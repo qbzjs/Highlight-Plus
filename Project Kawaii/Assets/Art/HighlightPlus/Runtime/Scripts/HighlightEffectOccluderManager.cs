@@ -177,6 +177,16 @@ namespace HighlightPlus {
         static RaycastHit[] occluderHits;
         readonly Dictionary<Camera, List<Renderer>> cachedOccludersPerCamera = new Dictionary<Camera, List<Renderer>>();
 
+        void AddWithoutRepetition<T>(List<T> target, List<T> source) {
+            int sourceCount = source.Count;
+            for (int k = 0; k < sourceCount; k++) {
+                T entry = source[k];
+                if (entry != null && !target.Contains(entry)) {
+                    target.Add(entry);
+                }
+            }
+        }
+
         void CheckOcclusionAccurate(CommandBuffer cbuf, Camera cam) {
 
             List<Renderer> occluderRenderers;
@@ -211,10 +221,8 @@ namespace HighlightPlus {
                             float maxDistance = Vector3.Distance(pos, camPos);
                             int numOccluderHits = Physics.BoxCastNonAlloc(pos, bounds.extents * seeThroughOccluderThreshold, (camPos - pos).normalized, occluderHits, quaternionIdentity, maxDistance, seeThroughOccluderMask);
                             for (int k = 0; k < numOccluderHits; k++) {
-                                Renderer rr = occluderHits[k].collider.GetComponentInChildren<Renderer>();
-                                if (rr != null && !occluderRenderers.Contains(rr)) {
-                                    occluderRenderers.Add(rr);
-                                }
+                                occluderHits[k].collider.transform.root.GetComponentsInChildren(tempRR);
+                                AddWithoutRepetition(occluderRenderers, tempRR);
                             }
                         }
                     }
@@ -230,10 +238,8 @@ namespace HighlightPlus {
                     float maxDistance = Vector3.Distance(pos, camPos);
                     int numOccluderHits = Physics.BoxCastNonAlloc(pos, bounds.extents * seeThroughOccluderThreshold, (camPos - pos).normalized, occluderHits, quaternionIdentity, maxDistance, seeThroughOccluderMask);
                     for (int k = 0; k < numOccluderHits; k++) {
-                        Renderer rr = occluderHits[k].collider.GetComponentInChildren<Renderer>();
-                        if (rr != null) {
-                            occluderRenderers.Add(rr);
-                        }
+                        occluderHits[k].collider.transform.root.GetComponentsInChildren(tempRR);
+                        AddWithoutRepetition(occluderRenderers, tempRR);
                     }
                 }
             }
@@ -243,9 +249,7 @@ namespace HighlightPlus {
             if (occluderRenderersCount > 0) {
                 for (int k = 0; k < occluderRenderersCount; k++) {
                     Renderer r = occluderRenderers[k];
-                    if (r != null) {
-                        cbuf.DrawRenderer(r, fxMatSeeThroughMask);
-                    }
+                    cbuf.DrawRenderer(r, fxMatSeeThroughMask);
                 }
             }
         }

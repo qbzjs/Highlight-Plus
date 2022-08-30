@@ -79,7 +79,11 @@ Properties {
                 float4 pos = ComputeVertexPosition(v.vertex);
                 float3 norm   = mul ((float3x3)UNITY_MATRIX_IT_MV, v.normal);
                 float2 offset = any(norm.xy)!=0 ? TransformViewToProjection(normalize(norm.xy)) : 0.0.xx;
-                offset += UNITY_ACCESS_INSTANCED_PROP(Props, _GlowDirection);
+                float2 glowDirection = UNITY_ACCESS_INSTANCED_PROP(Props, _GlowDirection);
+                #if defined(UNITY_STEREO_INSTANCING_ENABLED) || defined(UNITY_STEREO_MULTIVIEW_ENABLED) || defined(SINGLE_PASS_STEREO)
+                    glowDirection.x *= 2.0;
+                #endif
+                offset += glowDirection;
                 float z = lerp(UNITY_Z_0_FAR_FROM_CLIPSPACE(pos.z), 2.0, UNITY_MATRIX_P[3][3]);
                 z = _ConstantWidth * (z - 2.0) + 2.0;
                 float outlineWidth = _Glow2.x;

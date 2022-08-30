@@ -31,6 +31,15 @@ namespace HighlightPlus {
         public float fadeInDuration;
         public float fadeOutDuration;
 
+        [Tooltip("Fades out effects based on distance to camera")]
+        public bool cameraDistanceFade;
+
+        [Tooltip("The closest distance particles can get to the camera before they fade from the camera’s view.")]
+        public float cameraDistanceFadeNear;
+
+        [Tooltip("The farthest distance particles can get away from the camera before they fade from the camera’s view.")]
+        public float cameraDistanceFadeFar = 1000;
+
         [Tooltip("Keeps the outline/glow size unaffected by object distance.")]
         public bool constantWidth = true;
 
@@ -140,6 +149,8 @@ namespace HighlightPlus {
         [Range(0, 1)] public float seeThroughBorder;
         public Color seeThroughBorderColor = Color.black;
         public float seeThroughBorderWidth = 0.45f;
+        [Tooltip("Only display the border instead of the full see-through effect.")]
+        public bool seeThroughBorderOnly;
         [Tooltip("This option clears the stencil buffer after rendering the see-through effect which results in correct rendering order and supports other stencil-based effects that render afterwards.")]
         public bool seeThroughOrdered;
 
@@ -159,6 +170,9 @@ namespace HighlightPlus {
             effect.normalsOption = normalsOption;
             effect.fadeInDuration = fadeInDuration;
             effect.fadeOutDuration = fadeOutDuration;
+            effect.cameraDistanceFade = cameraDistanceFade;
+            effect.cameraDistanceFadeFar = cameraDistanceFadeFar;
+            effect.cameraDistanceFadeNear = cameraDistanceFadeNear;
             effect.constantWidth = constantWidth;
             effect.overlay = overlay;
             effect.overlayColor = overlayColor;
@@ -219,6 +233,7 @@ namespace HighlightPlus {
             effect.seeThroughBorder = seeThroughBorder;
             effect.seeThroughBorderColor = seeThroughBorderColor;
             effect.seeThroughBorderWidth = seeThroughBorderWidth;
+            effect.seeThroughBorderOnly = seeThroughBorderOnly;
             effect.seeThroughDepthOffset = seeThroughDepthOffset;
             effect.seeThroughMaxDepth = seeThroughMaxDepth;
             effect.seeThroughOrdered = seeThroughOrdered;
@@ -240,6 +255,9 @@ namespace HighlightPlus {
             normalsOption = effect.normalsOption;
             fadeInDuration = effect.fadeInDuration;
             fadeOutDuration = effect.fadeOutDuration;
+            cameraDistanceFade = effect.cameraDistanceFade;
+            cameraDistanceFadeFar = effect.cameraDistanceFadeFar;
+            cameraDistanceFadeNear = effect.cameraDistanceFadeNear;
             constantWidth = effect.constantWidth;
             overlay = effect.overlay;
             overlayColor = effect.overlayColor;
@@ -301,6 +319,7 @@ namespace HighlightPlus {
             seeThroughBorderColor = effect.seeThroughBorderColor;
             seeThroughBorderWidth = effect.seeThroughBorderWidth;
             seeThroughDepthOffset = effect.seeThroughDepthOffset;
+            seeThroughBorderOnly = effect.seeThroughBorderOnly;
             seeThroughMaxDepth = effect.seeThroughMaxDepth;
             seeThroughOrdered = effect.seeThroughOrdered;
             hitFxInitialIntensity = effect.hitFxInitialIntensity;
@@ -328,6 +347,8 @@ namespace HighlightPlus {
             seeThroughMaxDepth = Mathf.Max(0, seeThroughMaxDepth);
             seeThroughBorderWidth = Mathf.Max(0, seeThroughBorderWidth);
             targetFXFadePower = Mathf.Max(0, targetFXFadePower);
+            cameraDistanceFadeNear = Mathf.Max(0, cameraDistanceFadeNear);
+            cameraDistanceFadeFar = Mathf.Max(0, cameraDistanceFadeFar);
             if (glowPasses == null || glowPasses.Length == 0) {
                 glowPasses = new GlowPassData[4];
                 glowPasses[0] = new GlowPassData() { offset = 4, alpha = 0.1f, color = new Color(0.64f, 1f, 0f, 1f) };

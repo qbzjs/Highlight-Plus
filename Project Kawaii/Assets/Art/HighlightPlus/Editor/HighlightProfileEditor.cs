@@ -14,11 +14,12 @@ namespace HighlightPlus {
         SerializedProperty glow, glowWidth, glowQuality, glowDownsampling, glowHQColor, glowDithering, glowMagicNumber1, glowMagicNumber2, glowAnimationSpeed;
         SerializedProperty glowBlendPasses, glowVisibility, glowBlendMode, glowPasses, glowIgnoreMask;
         SerializedProperty innerGlow, innerGlowWidth, innerGlowColor, innerGlowVisibility;
-        SerializedProperty targetFX, targetFXTexture, targetFXColor, targetFXRotationSpeed, targetFXInitialScale, targetFXEndScale, targetFXScaleToRenderBound;
-        SerializedProperty targetFXAlignToGround, targetFXFadePower, targetFXGroundMaxDistance, targetFXGroundLayerMask, targetFXScaleToRenderBounds, targetFXTransitionDuration, targetFXStayDuration, targetFXVisibility;
+        SerializedProperty targetFX, targetFXTexture, targetFXColor, targetFXRotationSpeed, targetFXInitialScale, targetFXEndScale, targetFXScaleToRenderBounds;
+        SerializedProperty targetFXAlignToGround, targetFXFadePower, targetFXGroundMaxDistance, targetFXGroundLayerMask, targetFXTransitionDuration, targetFXStayDuration, targetFXVisibility;
         SerializedProperty seeThrough, seeThroughOccluderMask, seeThroughOccluderMaskAccurate, seeThroughOccluderThreshold, seeThroughOccluderCheckInterval, seeThroughOccluderCheckIndividualObjects, seeThroughDepthOffset, seeThroughMaxDepth;
-        SerializedProperty seeThroughIntensity, seeThroughTintAlpha, seeThroughTintColor, seeThroughNoise, seeThroughBorder, seeThroughBorderWidth, seeThroughBorderColor, seeThroughOrdered;
+        SerializedProperty seeThroughIntensity, seeThroughTintAlpha, seeThroughTintColor, seeThroughNoise, seeThroughBorder, seeThroughBorderWidth, seeThroughBorderColor, seeThroughOrdered, seeThroughBorderOnly;
         SerializedProperty hitFxInitialIntensity, hitFxMode, hitFxFadeOutDuration, hitFxColor, hitFxRadius;
+        SerializedProperty cameraDistanceFade, cameraDistanceFadeNear, cameraDistanceFadeFar;
 
         void OnEnable() {
             effectGroup = serializedObject.FindProperty("effectGroup");
@@ -93,12 +94,16 @@ namespace HighlightPlus {
             seeThroughBorder = serializedObject.FindProperty("seeThroughBorder");
             seeThroughBorderWidth = serializedObject.FindProperty("seeThroughBorderWidth");
             seeThroughBorderColor = serializedObject.FindProperty("seeThroughBorderColor");
+            seeThroughBorderOnly = serializedObject.FindProperty("seeThroughBorderOnly");
             seeThroughOrdered = serializedObject.FindProperty("seeThroughOrdered");
             hitFxInitialIntensity = serializedObject.FindProperty("hitFxInitialIntensity");
             hitFxMode = serializedObject.FindProperty("hitFxMode");
             hitFxFadeOutDuration = serializedObject.FindProperty("hitFxFadeOutDuration");
             hitFxColor = serializedObject.FindProperty("hitFxColor");
             hitFxRadius = serializedObject.FindProperty("hitFxRadius");
+            cameraDistanceFade = serializedObject.FindProperty("cameraDistanceFade");
+            cameraDistanceFadeNear = serializedObject.FindProperty("cameraDistanceFadeNear");
+            cameraDistanceFadeFar = serializedObject.FindProperty("cameraDistanceFadeFar");
         }
 
         public override void OnInspectorGUI() {
@@ -124,6 +129,13 @@ namespace HighlightPlus {
             EditorGUILayout.PropertyField(normalsOption);
             EditorGUILayout.PropertyField(fadeInDuration);
             EditorGUILayout.PropertyField(fadeOutDuration);
+            EditorGUILayout.PropertyField(cameraDistanceFade);
+            if (cameraDistanceFade.boolValue) {
+                EditorGUI.indentLevel++;
+                EditorGUILayout.PropertyField(cameraDistanceFadeNear, new GUIContent("Near Distance"));
+                EditorGUILayout.PropertyField(cameraDistanceFadeFar, new GUIContent("Far Distance"));
+                EditorGUI.indentLevel--;
+            }
             EditorGUILayout.PropertyField(constantWidth);
             EditorGUILayout.PropertyField(outlineIndependent, new GUIContent("Independent", "Do not combine outline with other highlighted objects."));
 
@@ -254,6 +266,7 @@ namespace HighlightPlus {
                     EditorGUI.indentLevel++;
                     EditorGUILayout.PropertyField(seeThroughBorderWidth, new GUIContent("Width"));
                     EditorGUILayout.PropertyField(seeThroughBorderColor, new GUIContent("Color"));
+                    EditorGUILayout.PropertyField(seeThroughBorderOnly, new GUIContent("Border Only"));
                     EditorGUI.indentLevel--;
                 }
                 EditorGUILayout.PropertyField(seeThroughOrdered, new GUIContent("Ordered"));

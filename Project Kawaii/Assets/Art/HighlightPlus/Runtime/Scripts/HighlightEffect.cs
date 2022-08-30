@@ -154,6 +154,20 @@ namespace HighlightPlus {
         [Tooltip("Enables GPU instancing. Reduces draw calls in outline and outer glow effects on platforms that support GPU instancing. Should be enabled by default.")]
         public bool GPUInstancing = true;
 
+        /// <summary>
+        /// Enabled depth buffer flip in HQ
+        /// </summary>
+        [Tooltip("Enables depth buffer clipping. Only applies to outline or outer glow in High Quality mode.")]
+        public bool depthClip;
+
+        [Tooltip("Fades out effects based on distance to camera")]
+        public bool cameraDistanceFade;
+
+        [Tooltip("The closest distance particles can get to the camera before they fade from the camera’s view.")]
+        public float cameraDistanceFadeNear;
+
+        [Tooltip("The farthest distance particles can get away from the camera before they fade from the camera’s view.")]
+        public float cameraDistanceFadeFar = 1000;
 
         [Tooltip("Normals handling option:\nPreserve original: use original mesh normals.\nSmooth: average normals to produce a smoother outline/glow mesh based effect.\nReorient: recomputes normals based on vertex direction to centroid.")]
         public NormalsOption normalsOption;
@@ -293,6 +307,8 @@ namespace HighlightPlus {
         [Range(0, 1)] public float seeThroughNoise = 1f;
         [Range(0, 1)] public float seeThroughBorder;
         public Color seeThroughBorderColor = Color.black;
+        [Tooltip("Only display the border instead of the full see-through effect.")]
+        public bool seeThroughBorderOnly;
         public float seeThroughBorderWidth = 0.45f;
         [Tooltip("This option clears the stencil buffer after rendering the see-through effect which results in correct rendering order and supports other stencil-based effects that render afterwards.")]
         public bool seeThroughOrdered;
@@ -576,7 +592,6 @@ namespace HighlightPlus {
         RenderTargetIdentifier colorAttachmentBuffer, depthAttachmentBuffer;
 
         public CommandBuffer GetCommandBuffer(Camera cam, RenderTargetIdentifier colorAttachmentBuffer, RenderTargetIdentifier depthAttachmentBuffer, FullScreenBlitMethod fullScreenBlit, bool clearStencil) {
-            //usingPipeline = true;
             this.colorAttachmentBuffer = colorAttachmentBuffer;
             this.depthAttachmentBuffer = depthAttachmentBuffer;
             this.FullScreenBlit = fullScreenBlit;
@@ -615,6 +630,12 @@ namespace HighlightPlus {
                 UpdateMaterialProperties();
             }
 
+            bool independentFullScreenNotExecuted = true;
+            if (clearStencil) {
+                cbHighlight.DrawMesh(quadMesh, matrix4x4Identity, fxMatClearStencil, 0, 0);
+                independentFullScreenNotExecuted = false;
+            }
+
             bool seeThroughReal = seeThroughIntensity > 0 && (seeThrough == SeeThroughMode.AlwaysWhenOccluded || (seeThrough == SeeThroughMode.WhenHighlighted && _highlighted));
             if (seeThroughReal) {
                 seeThroughReal = RenderSeeThroughOccluders(cbHighlight, cam);
@@ -646,8 +667,6 @@ namespace HighlightPlus {
 
             // Apply effect
             float glowReal = _highlighted ? this.glow : 0;
-            int layer = gameObject.layer;
-
             if (fxMatMask == null)
                 return;
 
@@ -657,27 +676,26 @@ namespace HighlightPlus {
 
             float aspect = cam.aspect;
             bool somePartVisible = false;
-            bool renderMaskOnTop = _highlighted && ((outline > 0 && smoothOutlineVisibility != Visibility.Normal) || (glow > 0 && smoothGlowVisibility != Visibility.Normal) || (innerGlow > 0 && innerGlowVisibility != Visibility.Normal));
 
             // First create masks
-            bool independentFullScreenNotExecuted = true;
-            if (clearStencil) {
-                cbHighlight.DrawMesh(quadMesh, matrix4x4Identity, fxMatClearStencil, 0, 0);
-                independentFullScreenNotExecuted = false;
-            }
-
             for (int k = 0; k < rmsCount; k++) {
                 rms[k].render = false;
                 Transform t = rms[k].transform;
                 if (t == null)
                     continue;
+
                 Mesh mesh = rms[k].mesh;
                 if (mesh == null)
                     continue;
-                if (((1 << t.gameObject.layer) & cullingMask) == 0)
-                    continue;
-                if (!rms[k].renderer.isVisible && !ignoreObjectVisibility)
-                    continue;
+
+                if (!ignoreObjectVisibility) {
+                    int layer = t.gameObject.layer;
+                    if (((1 << layer) & cullingMask) == 0)
+                        continue;
+                    if (!rms[k].renderer.isVisible)
+                        continue;
+                }
+
                 rms[k].render = true;
                 somePartVisible = true;
 
@@ -721,26 +739,33 @@ namespace HighlightPlus {
                     }
                 }
 
-                if (maskRequired) {
-                    RenderMask(k, mesh, renderMaskOnTop);
+            }
+
+            bool renderMaskOnTop = _highlighted && ((outline > 0 && smoothOutlineVisibility != Visibility.Normal) || (glow > 0 && smoothGlowVisibility != Visibility.Normal) || (innerGlow > 0 && innerGlowVisibility != Visibility.Normal));
+            if (maskRequired) {
+                for (int k = 0; k < rmsCount; k++) {
+                    if (rms[k].render) {
+                        RenderMask(k, rms[k].mesh, renderMaskOnTop);
+                    }
                 }
             }
 
             // Compute tweening
+            float fadeGroup = 1f;
             float fade = 1f;
             if (fading != FadingState.NoFading) {
                 if (fading == FadingState.FadingIn) {
                     if (fadeInDuration > 0) {
-                        fade = (Time.time - fadeStartTime) / fadeInDuration;
-                        if (fade > 1f) {
-                            fade = 1f;
+                        fadeGroup = (Time.time - fadeStartTime) / fadeInDuration;
+                        if (fadeGroup > 1f) {
+                            fadeGroup = 1f;
                             fading = FadingState.NoFading;
                         }
                     }
                 } else if (fadeOutDuration > 0) {
-                    fade = 1f - (Time.time - fadeStartTime) / fadeOutDuration;
-                    if (fade < 0f) {
-                        fade = 0f;
+                    fadeGroup = 1f - (Time.time - fadeStartTime) / fadeOutDuration;
+                    if (fadeGroup < 0f) {
+                        fadeGroup = 0f;
                         fading = FadingState.NoFading;
                         _highlighted = false;
                         if (OnObjectHighlightEnd != null) {
@@ -765,6 +790,13 @@ namespace HighlightPlus {
                 if (!rms[k].render)
                     continue;
                 Mesh mesh = rms[k].mesh;
+
+                fade = fadeGroup;
+                // Distance fade
+                if (cameraDistanceFade) {
+                    fade *= ComputeCameraDistanceFade(rms[k].transform.position, cam.transform);
+                }
+
 
                 if (_highlighted || hitActive) {
                     // Hit FX
@@ -1639,7 +1671,6 @@ namespace HighlightPlus {
                 if (renderer.transform != target) {
                     HighlightEffect otherEffect = renderer.GetComponent<HighlightEffect>();
                     if (otherEffect != null && otherEffect.enabled) {
-                        otherEffect.highlighted = highlighted;
                         continue; // independent subobject
                     }
                 }
@@ -1721,15 +1752,11 @@ namespace HighlightPlus {
             UpdateMaterialProperties();
         }
 
-        List<Renderer> tempRR;
+        readonly List<Renderer> tempRR = new List<Renderer>();
 
         Renderer[] FindRenderersWithLayerInScene(LayerMask layer) {
             Renderer[] rr = FindObjectsOfType<Renderer>();
-            if (tempRR == null) {
-                tempRR = new List<Renderer>();
-            } else {
-                tempRR.Clear();
-            }
+            tempRR.Clear();
             for (var i = 0; i < rr.Length; i++) {
                 Renderer r = rr[i];
                 if (((1 << r.gameObject.layer) & layer) != 0) {
@@ -1741,11 +1768,7 @@ namespace HighlightPlus {
 
         Renderer[] FindRenderersWithLayerInChildren(LayerMask layer) {
             Renderer[] rr = target.GetComponentsInChildren<Renderer>();
-            if (tempRR == null) {
-                tempRR = new List<Renderer>();
-            } else {
-                tempRR.Clear();
-            }
+            tempRR.Clear();
             for (var i = 0; i < rr.Length; i++) {
                 Renderer r = rr[i];
                 if (((1 << r.gameObject.layer) & layer) != 0) {
@@ -1971,7 +1994,7 @@ namespace HighlightPlus {
                             fxMat.SetInt(ShaderParams.Cull, cullBackFaces ? (int)CullMode.Back : (int)CullMode.Off);
                             fxMat.SetFloat(ShaderParams.ConstantWidth, constantWidth ? 1.0f : 0);
                             fxMat.SetInt(ShaderParams.GlowStencilOp, glowBlendPasses ? (int)StencilOp.Keep : (int)StencilOp.Replace);
-				            fxMat.SetInt(ShaderParams.GlowStencilComp, glowIgnoreMask ? (int)CompareFunction.Always : (int)CompareFunction.NotEqual);
+                            fxMat.SetInt(ShaderParams.GlowStencilComp, glowIgnoreMask ? (int)CompareFunction.Always : (int)CompareFunction.NotEqual);
 
                             if (useAlphaTest) {
                                 fxMat.mainTexture = matTexture;
@@ -1992,8 +2015,6 @@ namespace HighlightPlus {
                                 fxMat.SetFloat(ShaderParams.SeeThrough, seeThroughIntensity);
                                 fxMat.SetFloat(ShaderParams.SeeThroughNoise, seeThroughNoise);
                                 fxMat.SetColor(ShaderParams.SeeThroughTintColor, seeThroughTintColor);
-                                fxMat.SetFloat(ShaderParams.SeeThroughBorderWidth, (seeThroughBorder * seeThroughBorderWidth) > 0 ? seeThroughBorderWidth / 100f : 0);
-                                fxMat.SetFloat(ShaderParams.SeeThroughBorderConstantWidth, constantWidth ? 1.0f : 0);
                                 if (seeThroughOccluderMaskAccurate && seeThroughOccluderMask != -1) {
                                     fxMat.SetInt(ShaderParams.SeeThroughStencilRef, 1);
                                     fxMat.SetInt(ShaderParams.SeeThroughStencilComp, (int)CompareFunction.Equal);
@@ -2021,6 +2042,11 @@ namespace HighlightPlus {
                                 } else {
                                     fxMat.DisableKeyword(ShaderParams.SKW_DEPTH_OFFSET);
                                 }
+                                if (seeThroughBorderOnly) {
+                                    fxMat.EnableKeyword(ShaderParams.SKW_SEETHROUGH_ONLY_BORDER);
+                                } else {
+                                    fxMat.DisableKeyword(ShaderParams.SKW_SEETHROUGH_ONLY_BORDER);
+                                }
                             }
                         }
 
@@ -2029,6 +2055,8 @@ namespace HighlightPlus {
                             Material fxMat = rms[k].fxMatSeeThroughBorder[l];
                             if (fxMat != null) {
                                 fxMat.SetColor(ShaderParams.SeeThroughBorderColor, new Color(seeThroughBorderColor.r, seeThroughBorderColor.g, seeThroughBorderColor.b, seeThroughBorder));
+                                fxMat.SetFloat(ShaderParams.SeeThroughBorderWidth, (seeThroughBorder * seeThroughBorderWidth) > 0 ? seeThroughBorderWidth / 100f : 0);
+                                fxMat.SetFloat(ShaderParams.SeeThroughBorderConstantWidth, constantWidth ? 1.0f : 0);
                                 if (seeThroughOccluderMaskAccurate && seeThroughOccluderMask != -1) {
                                     fxMat.SetInt(ShaderParams.SeeThroughStencilRef, 1);
                                     fxMat.SetInt(ShaderParams.SeeThroughStencilComp, (int)CompareFunction.Equal);
@@ -2139,10 +2167,24 @@ namespace HighlightPlus {
             }
         }
 
+        float ComputeCameraDistanceFade(Vector3 position, Transform cameraTransform) {
+            Vector3 heading = position - cameraTransform.position;
+            float distance = Vector3.Dot(heading, cameraTransform.forward);
+            if (distance < cameraDistanceFadeNear) {
+                return 1f - Mathf.Min(1f, cameraDistanceFadeNear - distance);
+            }
+            if (distance > cameraDistanceFadeFar) {
+                return 1f - Mathf.Min(1f, distance - cameraDistanceFadeFar);
+            }
+            return 1f;
+        }
+
         int GetZTestValue(Visibility param) {
             switch (param) {
-                case Visibility.AlwaysOnTop: return (int)CompareFunction.Always;
-                case Visibility.OnlyWhenOccluded: return (int)CompareFunction.Greater;
+                case Visibility.AlwaysOnTop:
+                    return (int)CompareFunction.Always;
+                case Visibility.OnlyWhenOccluded:
+                    return (int)CompareFunction.Greater;
                 default:
                     return (int)CompareFunction.LessEqual;
             }

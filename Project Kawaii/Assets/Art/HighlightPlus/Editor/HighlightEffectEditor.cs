@@ -21,10 +21,11 @@ namespace HighlightPlus {
         SerializedProperty glowBlendPasses, glowPasses, glowVisibility, glowBlendMode, glowBlitDebug, glowIgnoreMask;
         SerializedProperty innerGlow, innerGlowWidth, innerGlowColor, innerGlowVisibility;
         SerializedProperty seeThrough, seeThroughOccluderMask, seeThroughOccluderMaskAccurate, seeThroughOccluderThreshold, seeThroughOccluderCheckInterval, seeThroughOccluderCheckIndividualObjects, seeThroughDepthOffset, seeThroughMaxDepth;
-        SerializedProperty seeThroughIntensity, seeThroughTintAlpha, seeThroughTintColor, seeThroughNoise, seeThroughBorder, seeThroughBorderWidth, seeThroughBorderColor, seeThroughOrdered;
+        SerializedProperty seeThroughIntensity, seeThroughTintAlpha, seeThroughTintColor, seeThroughNoise, seeThroughBorder, seeThroughBorderWidth, seeThroughBorderColor, seeThroughOrdered, seeThroughBorderOnly;
         SerializedProperty targetFX, targetFXTexture, targetFXColor, targetFXCenter, targetFXRotationSpeed, targetFXInitialScale, targetFXEndScale, targetFXScaleToRenderBounds;
         SerializedProperty targetFXAlignToGround, targetFXFadePower, targetFXGroundMaxDistance, targetFXGroundLayerMask, targetFXTransitionDuration, targetFXStayDuration, targetFXVisibility;
         SerializedProperty hitFxInitialIntensity, hitFxMode, hitFxFadeOutDuration, hitFxColor, hitFxRadius;
+        SerializedProperty cameraDistanceFade, cameraDistanceFadeNear, cameraDistanceFadeFar;
         HighlightEffect thisEffect;
         bool profileChanged, enableProfileApply;
 
@@ -111,6 +112,7 @@ namespace HighlightPlus {
             seeThroughBorderWidth = serializedObject.FindProperty("seeThroughBorderWidth");
             seeThroughBorderColor = serializedObject.FindProperty("seeThroughBorderColor");
             seeThroughOrdered = serializedObject.FindProperty("seeThroughOrdered");
+            seeThroughBorderOnly = serializedObject.FindProperty("seeThroughBorderOnly");
             targetFX = serializedObject.FindProperty("targetFX");
             targetFXTexture = serializedObject.FindProperty("targetFXTexture");
             targetFXRotationSpeed = serializedObject.FindProperty("targetFXRotationSpeed");
@@ -131,6 +133,9 @@ namespace HighlightPlus {
             hitFxFadeOutDuration = serializedObject.FindProperty("hitFxFadeOutDuration");
             hitFxColor = serializedObject.FindProperty("hitFxColor");
             hitFxRadius = serializedObject.FindProperty("hitFxRadius");
+            cameraDistanceFade = serializedObject.FindProperty("cameraDistanceFade");
+            cameraDistanceFadeNear = serializedObject.FindProperty("cameraDistanceFadeNear");
+            cameraDistanceFadeFar = serializedObject.FindProperty("cameraDistanceFadeFar");
 
             thisEffect = (HighlightEffect)target;
             thisEffect.Refresh();
@@ -288,6 +293,13 @@ namespace HighlightPlus {
                     EditorGUILayout.PropertyField(cullBackFaces);
                     EditorGUILayout.PropertyField(fadeInDuration);
                     EditorGUILayout.PropertyField(fadeOutDuration);
+                    EditorGUILayout.PropertyField(cameraDistanceFade);
+                    if (cameraDistanceFade.boolValue) {
+                        EditorGUI.indentLevel++;
+                        EditorGUILayout.PropertyField(cameraDistanceFadeNear, new GUIContent("Near Distance"));
+                        EditorGUILayout.PropertyField(cameraDistanceFadeFar, new GUIContent("Far Distance"));
+                        EditorGUI.indentLevel--;
+                    }
                     if ((PlayerSettings.virtualRealitySupported && ((outlineQuality.intValue == (int)QualityLevel.Highest && outline.floatValue > 0) || (glowQuality.intValue == (int)QualityLevel.Highest && glow.floatValue > 0)))) {
                         EditorGUILayout.PropertyField(flipY, new GUIContent("Flip Y Fix", "Flips outline/glow effect to fix bug introduced in Unity 2019.1.0 when VR is enabled."));
                     }
@@ -516,6 +528,7 @@ namespace HighlightPlus {
                     EditorGUI.indentLevel++;
                     EditorGUILayout.PropertyField(seeThroughBorderWidth, new GUIContent("Width"));
                     EditorGUILayout.PropertyField(seeThroughBorderColor, new GUIContent("Color"));
+                    EditorGUILayout.PropertyField(seeThroughBorderOnly, new GUIContent("Border Only"));
                     EditorGUI.indentLevel--;
                 }
                 EditorGUILayout.PropertyField(seeThroughOrdered, new GUIContent("Ordered"));

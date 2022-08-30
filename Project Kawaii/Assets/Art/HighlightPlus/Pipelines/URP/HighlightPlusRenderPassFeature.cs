@@ -9,7 +9,7 @@ namespace HighlightPlus {
         class HighlightPass : ScriptableRenderPass {
 
             // far objects render first
-            class DistanceComparer: IComparer<HighlightEffect> {
+            class DistanceComparer : IComparer<HighlightEffect> {
 
                 public Vector3 camPos;
 
@@ -36,8 +36,9 @@ namespace HighlightPlus {
             ScriptableRenderer renderer;
             RenderTextureDescriptor cameraTextureDescriptor;
             DistanceComparer effectDistanceComparer;
-            bool isVREnabled;
+            static bool isVREnabled;
             bool clearStencil;
+            FullScreenBlitMethod fullScreenBlitMethod = FullScreenBlit;
 
             public void Setup(HighlightPlusRenderPassFeature passFeature, ScriptableRenderer renderer) {
                 this.renderPassEvent = passFeature.renderPassEvent;
@@ -64,7 +65,7 @@ namespace HighlightPlus {
                 RenderTargetIdentifier cameraColorTarget = renderer.cameraColorTarget;
                 RenderTargetIdentifier cameraDepthTarget = renderer.cameraDepthTarget;
 #if !UNITY_2021_2_OR_NEWER
-// In Unity 2021.2, when MSAA > 1, cameraDepthTarget is no longer cameraColorTarget
+                // In Unity 2021.2, when MSAA > 1, cameraDepthTarget is no longer cameraColorTarget
                 if (!usesCameraOverlay && (cameraTextureDescriptor.msaaSamples > 1 || cam.cameraType == CameraType.SceneView)) {
                     cameraDepthTarget = cameraColorTarget;
                 }
@@ -80,7 +81,7 @@ namespace HighlightPlus {
                     HighlightEffect effect = HighlightEffect.effects[k];
                     if (effect.isActiveAndEnabled) {
                         if ((effect.camerasLayerMask & camLayer) == 0) continue;
-                        CommandBuffer cb = effect.GetCommandBuffer(cam, cameraColorTarget, cameraDepthTarget, FullScreenBlit, clearStencil);
+                        CommandBuffer cb = effect.GetCommandBuffer(cam, cameraColorTarget, cameraDepthTarget, fullScreenBlitMethod, clearStencil);
                         if (cb != null) {
                             context.ExecuteCommandBuffer(cb);
                             clearStencil = false;
@@ -90,7 +91,7 @@ namespace HighlightPlus {
             }
 
             static Matrix4x4 matrix4x4identity = Matrix4x4.identity;
-            void FullScreenBlit(CommandBuffer cmd, RenderTargetIdentifier source, RenderTargetIdentifier destination, Material material, int passIndex) {
+            static void FullScreenBlit(CommandBuffer cmd, RenderTargetIdentifier source, RenderTargetIdentifier destination, Material material, int passIndex) {
                 destination = new RenderTargetIdentifier(destination, 0, CubemapFace.Unknown, -1);
                 cmd.SetRenderTarget(destination);
                 cmd.SetGlobalTexture(ShaderParams.MainTex, source);

@@ -10,6 +10,7 @@ Properties {
         // See through effect
         Pass
         { 
+            Name "See-through mask"
             Stencil {
                 WriteMask 3
                 Ref 1

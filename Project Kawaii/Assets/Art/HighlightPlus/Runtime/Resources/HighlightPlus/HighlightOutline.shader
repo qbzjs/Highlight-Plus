@@ -12,9 +12,9 @@ Properties {
     {
         Tags { "Queue"="Transparent+120" "RenderType"="Transparent" "DisableBatching"="True" }
 
-        // Outline
         Pass
         {
+            Name "Outline"
             Stencil {
                 Ref 2
                 Comp NotEqual
@@ -76,6 +76,9 @@ Properties {
 				float z = lerp(UNITY_Z_0_FAR_FROM_CLIPSPACE(o.pos.z), 2.0, UNITY_MATRIX_P[3][3]);
                 z = _ConstantWidth * (z - 2.0) + 2.0;
                 float4 outlineDirection =  UNITY_ACCESS_INSTANCED_PROP(Props, _OutlineDirection); 
+                #if defined(UNITY_STEREO_INSTANCING_ENABLED) || defined(UNITY_STEREO_MULTIVIEW_ENABLED) || defined(SINGLE_PASS_STEREO)
+                outlineDirection.x *= 2.0;
+                #endif
 				o.pos.xy += offset * z * _OutlineWidth + outlineDirection.xy * z;
 				o.uv = TRANSFORM_TEX (v.uv, _MainTex);
                 return o;
@@ -92,9 +95,9 @@ Properties {
             ENDCG
         }
 
-        // Outline Clear Stencil
         Pass
         {
+            Name "Outline Clear Stencil"
             Stencil {
                 Ref 2
                 Comp Always
