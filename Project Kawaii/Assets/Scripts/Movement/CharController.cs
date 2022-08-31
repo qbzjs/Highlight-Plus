@@ -115,6 +115,10 @@ public class CharController : MonoBehaviour
         //Callback
         characterMovement.collisionBehaviorCallback -= CollisionBehaviorCallback;
     }
+    private void Update()
+    {
+        HandleInput();
+    }
     #endregion Unity Methods
 
     #region OnEvents
@@ -157,6 +161,35 @@ public class CharController : MonoBehaviour
     #endregion OnEvents
 
     #region Input Methods
+    private float horizontal;
+    private float vertical;
+    private void HandleInput()
+    {
+        //BUG: Moving player with controller and camera with mouse stutters / stops movement, fixed when using getaxisraw
+        // Read Input values
+        //float horizontal = Input.GetAxisRaw($"Horizontal");
+        //float vertical = Input.GetAxisRaw($"Vertical");
+
+        // Create a movement direction vector (in world space)
+        movementDirection = Vector3.zero;
+        movementDirection += Vector3.forward * vertical;
+        movementDirection += Vector3.right * horizontal;
+
+        // Make movementDirection vector relative to camera view direction
+        movementDirection = movementDirection.relativeTo(playerCamera.transform);
+
+        // Make Sure it won't move faster diagonally
+        movementDirection = Vector3.ClampMagnitude(movementDirection, 1.0f);
+
+        /*
+        //Crouch
+        crouch = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.C);
+
+        //Jump
+        jump = Input.GetButton($"Jump");
+        */
+    }
+
     private void OnMovement(InputValue value)
     {
         /* 
@@ -172,25 +205,15 @@ public class CharController : MonoBehaviour
         Vector2 inputPressed = value.Get<Vector2>();
 
         //Read Input values
-        float horizontal = inputPressed.x;
-        float vertical = inputPressed.y;
-
-        //Create a Movement direction vector(in world space)
-        movementDirection = Vector3.zero;
-        movementDirection += Vector3.forward * vertical;
-        movementDirection += Vector3.right * horizontal;
-
-        //Make Sure it won't move faster diagonally
-        movementDirection = Vector3.ClampMagnitude(movementDirection, 1.0f);
-
-        //Make movementDirection relative to camera view direction
-        movementDirection = movementDirection.relativeTo(playerCamera.transform);
+        horizontal = inputPressed.x;
+        vertical = inputPressed.y;
     }
 
     private void OnJump(InputValue value)
     {
         Debug.Log("On jump");
-        jump = value.isPressed;
+        if (characterMovement.isGrounded)
+            jump = value.isPressed;
     }
 
     private void OnCrouch(InputValue value)
@@ -209,17 +232,19 @@ public class CharController : MonoBehaviour
     #region Movement Methods
     private void UpdateRotation()
     {
+        // Rotate towards character's movement direction
         characterMovement.RotateTowards(movementDirection, rotationRate * Time.deltaTime);
     }
 
     private void GroundedMovement(Vector3 desiredVelocity)
     {
-        characterMovement.velocity = Vector3.Lerp(characterMovement.velocity, desiredVelocity,
-            1f - Mathf.Exp(-groundFriction * Time.deltaTime));
+        characterMovement.velocity = Vector3.Lerp(characterMovement.velocity,
+            desiredVelocity, 1f - Mathf.Exp(-groundFriction * Time.deltaTime));
     }
 
     private void NotGroundedMovement(Vector3 desiredVelocity)
     {
+        // Current character's velocity
         Vector3 velocity = characterMovement.velocity;
 
         // If moving into non-walkable ground, limit its contribution.
@@ -292,8 +317,17 @@ public class CharController : MonoBehaviour
 
     private void Move()
     {
+        Jumping();
+
+        Crouching();
+
+        //Different?
+        //--------------------------------------------------------------------------
         float targetSpeed = isCrouching ? maxSpeed * crouchSpeedModifier : maxSpeed;
         targetSpeed = sprint ? maxSpeed * sprintSpeedModifier : maxSpeed;
+        //--------------------------------------------------------------------------
+
+        // Create our desired velocity using the previously created movement direction vector
         Vector3 desiredVelocity = movementDirection * targetSpeed;
 
         // Update character's velocity based on its grounding status
@@ -302,9 +336,7 @@ public class CharController : MonoBehaviour
         else
             NotGroundedMovement(desiredVelocity);
 
-        Jumping();
-        Crouching();
-
+        // Perform movement using character's current velocity
         characterMovement.Move();
 
         //Simple Move EXAMPLE
@@ -319,6 +351,20 @@ public class CharController : MonoBehaviour
         characterMovement.SimpleMove(desiredVelocity, actualMaxSpeed, actualAcceleration, actualBrakingDeceleration, actualFriction, actualBrakingFriction, gravity);
         */
     }
+
+    /*
+    private float GetMaxSpeed()
+    {
+        if (characterMovement.isGrounded)
+            return isCrouching ? maxSpeed * crouchingSpeedModifier : maxSpeed;
+        return maxSpeed;
+    }
+    private float GetMaxAcceleration()
+    {
+        return characterMovement.isGrounded ? maxAcceleration : maxAcceleration *
+        airControl;
+    }
+    */
     #endregion Movement Methods
 
     #region Callbacks

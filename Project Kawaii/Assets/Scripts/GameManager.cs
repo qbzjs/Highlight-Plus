@@ -9,12 +9,12 @@ public class GameManager : MonoBehaviour
     private CharacterProfile playerProfile;
 
     private string charName;
-    private int raceInt = 2;
-    private int skinInt = 0;
-    private int faceInt = 0;
-    private int headAccessory = 0;
-    private int chestAccessory = 0;
-    private int handAccessory = 0;
+    private static int raceInt = 2;
+    private static int skinInt = 0;
+    private static int faceInt = 0;
+    private static int headAccessory = 0;
+    private static int chestAccessory = 0;
+    private static int handAccessory = 0;
 
     [SerializeField]
     private MaterialLists faces;
@@ -44,6 +44,12 @@ public class GameManager : MonoBehaviour
         LoadPlayerCharacter();   
     }
     #endregion Unity Methods
+
+    public static int GetRaceInt()
+    {
+        return raceInt;
+    }
+
     public void SaveCustomization()
     {
         playerProfile.SaveNameString(charName);
