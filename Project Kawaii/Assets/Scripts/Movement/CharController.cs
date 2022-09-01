@@ -35,7 +35,12 @@ public class CharController : MonoBehaviour
     [Range(0.0f, 1.0f)]
     [Tooltip("When falling, amount of horizontal movement control available to the character.\n" +
              "0 = no control, 1 = full control at max acceleration.")]
-    public float airControl = 0.3f;
+    public float airControl = 0.25f;
+
+    [Range(0.0f, 1.0f)]
+    [Tooltip("When falling, amount of horizontal movement control available to the character.\n" +
+             "0 = no control, 1 = full control at max acceleration.")]
+    public float airTurnControl = 0.25f;
 
     [Tooltip("The character's gravity.")]
     public Vector3 gravity = Vector3.down * 9.81f;
@@ -52,8 +57,17 @@ public class CharController : MonoBehaviour
     public float crouchSpeedModifier = 0.5f;
 
     [Tooltip("The max speed modifier while crouching.")]
-    [Range(0.0f, 1.0f)]
+    [Range(0.0f, 2.0f)]
     public float sprintSpeedModifier = 1.5f;
+
+    [Tooltip("Max amount of jumps before having to land")]
+    public int maxJumpCount = 2;
+
+    [Header("Anim Settings")]
+    [SerializeField]
+    private Animator[] baseAnimals;
+
+    private int currJumpCount = 0;
 
     private Coroutine _lateFixedUpdateCoroutine;
 
@@ -166,7 +180,7 @@ public class CharController : MonoBehaviour
     private void HandleInput()
     {
         //BUG: Moving player with controller and camera with mouse stutters / stops movement, fixed when using getaxisraw
-        // Read Input values
+        //Read Input values
         //float horizontal = Input.GetAxisRaw($"Horizontal");
         //float vertical = Input.GetAxisRaw($"Vertical");
 
@@ -181,51 +195,53 @@ public class CharController : MonoBehaviour
         // Make Sure it won't move faster diagonally
         movementDirection = Vector3.ClampMagnitude(movementDirection, 1.0f);
 
-        /*
-        //Crouch
-        crouch = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.C);
-
-        //Jump
-        jump = Input.GetButton($"Jump");
-        */
+        //baseAnimals[GameManager.GetRaceInt()].SetFloat("Movement", );
     }
 
     private void OnMovement(InputValue value)
     {
-        /* 
-        //Ignore other characters collision
-        public void IgnoreCollision(Collider otherCollider, bool ignore = true);
-        public void IgnoreCollision(Rigidbody otherRigidbody, bool ignore = true)
-        //The former specifically ignores collisions against the given collider, while the latter will
-        //ignore all the colliders attached to the given Rigidbody.
-        */
-
         Debug.Log("On movement");
         //Get Input
         Vector2 inputPressed = value.Get<Vector2>();
+
+        //Tells Animator that player is moving
+        if(inputPressed.x != 0 || inputPressed.y != 0)
+        {
+            baseAnimals[GameManager.GetRaceInt()].SetBool("isMoving", true);
+            baseAnimals[GameManager.GetRaceInt()].SetFloat("Movement", Mathf.Clamp01(movementDirection.magnitude));
+        }
+        else
+        {
+            baseAnimals[GameManager.GetRaceInt()].SetBool("isMoving", false);
+            baseAnimals[GameManager.GetRaceInt()].SetFloat("Movement", 0);
+        }
+
 
         //Read Input values
         horizontal = inputPressed.x;
         vertical = inputPressed.y;
     }
 
-    private void OnJump(InputValue value)
+    private void OnJump()
     {
         Debug.Log("On jump");
-        if (characterMovement.isGrounded)
-            jump = value.isPressed;
+        if (currJumpCount < maxJumpCount && !jump)
+        {
+            jump = true;
+            baseAnimals[GameManager.GetRaceInt()].SetTrigger("Jump");
+        }
     }
 
-    private void OnCrouch(InputValue value)
+    private void OnCrouch()
     {
         Debug.Log("On crouch");
-        crouch = value.isPressed;
+        crouch = !crouch;
     }
 
-    private void OnSprint(InputValue value)
+    private void OnSprint()
     {
         Debug.Log("On sprint");
-        sprint = value.isPressed;
+        sprint = !sprint;
     }
     #endregion Input Methods
 
@@ -233,7 +249,10 @@ public class CharController : MonoBehaviour
     private void UpdateRotation()
     {
         // Rotate towards character's movement direction
-        characterMovement.RotateTowards(movementDirection, rotationRate * Time.deltaTime);
+        if(characterMovement.isGrounded)
+            characterMovement.RotateTowards(movementDirection, rotationRate * Time.deltaTime);
+        else
+            characterMovement.RotateTowards(movementDirection, rotationRate * airTurnControl * Time.deltaTime);
     }
 
     private void GroundedMovement(Vector3 desiredVelocity)
@@ -302,12 +321,16 @@ public class CharController : MonoBehaviour
 
     private void Jumping()
     {
-        if (jump && characterMovement.isGrounded)
+        if (jump && currJumpCount < maxJumpCount)
         {
             jump = false;
+            currJumpCount++;
 
-            // Pause ground constraint so character can jump off ground
-            characterMovement.PauseGroundConstraint();
+            if (characterMovement.isGrounded)
+            {
+                // Pause ground constraint so character can jump off ground
+                characterMovement.PauseGroundConstraint();
+            }
 
             // perform the jump
             Vector3 jumpVelocity = Vector3.up * jumpImpulse;
@@ -321,50 +344,35 @@ public class CharController : MonoBehaviour
 
         Crouching();
 
-        //Different?
+        //BUG: Need to better control crouch and sprint states
         //--------------------------------------------------------------------------
-        float targetSpeed = isCrouching ? maxSpeed * crouchSpeedModifier : maxSpeed;
-        targetSpeed = sprint ? maxSpeed * sprintSpeedModifier : maxSpeed;
-        //--------------------------------------------------------------------------
+        float targetSpeed = 0;
+        //Change speed for crouching
+        if (crouch)
+            targetSpeed = isCrouching ? maxSpeed * crouchSpeedModifier : maxSpeed;
+        //Change speed for sprinting
+        else if (sprint)
+            targetSpeed = sprint ? maxSpeed * sprintSpeedModifier : maxSpeed;
+        else
+            targetSpeed = maxSpeed;
+        //---------------------------------------------------------------------------
+
 
         // Create our desired velocity using the previously created movement direction vector
         Vector3 desiredVelocity = movementDirection * targetSpeed;
 
         // Update character's velocity based on its grounding status
         if (characterMovement.isGrounded)
+        {
+            currJumpCount = 0;
             GroundedMovement(desiredVelocity);
+        }
         else
             NotGroundedMovement(desiredVelocity);
 
         // Perform movement using character's current velocity
         characterMovement.Move();
-
-        //Simple Move EXAMPLE
-        /*
-        float actualMaxSpeed = isCrouching ? maxSpeed * crouchingSpeedModifier : maxSpeed;
-        float actualAcceleration = characterMovement.isGrounded ? acceleration : acceleration * airControl;
-        float actualBrakingDeceleration = characterMovement.isGrounded ? deceleration : 0.0f;
-        float actualFriction = characterMovement.isGrounded ? groundFriction : airFriction;
-        float actualBrakingFriction = useSeparateBrakingFriction ? brakingFriction : GetFriction();
-
-        Vector3 desiredVelocity = movementDirection * actualMaxSpeed;
-        characterMovement.SimpleMove(desiredVelocity, actualMaxSpeed, actualAcceleration, actualBrakingDeceleration, actualFriction, actualBrakingFriction, gravity);
-        */
     }
-
-    /*
-    private float GetMaxSpeed()
-    {
-        if (characterMovement.isGrounded)
-            return isCrouching ? maxSpeed * crouchingSpeedModifier : maxSpeed;
-        return maxSpeed;
-    }
-    private float GetMaxAcceleration()
-    {
-        return characterMovement.isGrounded ? maxAcceleration : maxAcceleration *
-        airControl;
-    }
-    */
     #endregion Movement Methods
 
     #region Callbacks
