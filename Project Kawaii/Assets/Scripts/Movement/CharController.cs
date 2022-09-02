@@ -1,71 +1,86 @@
 ﻿using EasyCharacterMovement;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
+/// <summary>
+/// This Class Contains Input Handling And Movement Related Code
+/// </summary>
 public class CharController : MonoBehaviour
 {
     #region Variables
+    [Header("Base Requirements")]
     public InputActionAsset inputActions;
 
-    [Space(15f)]
     [Tooltip("The Player following camera.")]
     public Camera playerCamera;
 
-    [Tooltip("Change in rotation per second (Deg / s).")]
+    [Header("Core Movement Settings")]
+    [Tooltip("Change in rotation per second (Deg / s)")]
     public float rotationRate = 540.0f;
 
-    [Space(15f)]
     [Tooltip("The character's maximum speed.")]
     public float maxSpeed = 5.0f;
 
-    [Tooltip("Max Acceleration (rate of change of velocity).")]
+    [Tooltip("Max Acceleration (rate of change of velocity)")]
     public float maxAcceleration = 20.0f;
 
-    [Tooltip("Setting that affects movement control. Higher values allow faster changes in direction.")]
+    [Tooltip("The max speed modifier sprinting")]
+    [Range(0.0f, 2.0f)]
+    public float sprintSpeedModifier = 1.5f;
+
+    [Tooltip("Setting that affects movement control. Higher values allow faster changes in direction")]
     public float groundFriction = 8.0f;
 
-    [Space(15f)]
-    [Tooltip("Initial velocity (instantaneous vertical velocity) when jumping.")]
+    [Tooltip("Initial velocity (instantaneous vertical velocity) when jumping")]
     public float jumpImpulse = 6.5f;
 
-    [Tooltip("Friction to apply when falling.")]
+    [Tooltip("Max amount of jumps before having to land")]
+    public int maxJumpCount = 2;
+
+    [Tooltip("Friction to apply when falling")]
     public float airFriction = 0.1f;
 
     [Range(0.0f, 1.0f)]
     [Tooltip("When falling, amount of horizontal movement control available to the character.\n" +
-             "0 = no control, 1 = full control at max acceleration.")]
+             "0 = no control, 1 = full control at max acceleration")]
     public float airControl = 0.25f;
 
     [Range(0.0f, 1.0f)]
     [Tooltip("When falling, amount of horizontal movement control available to the character.\n" +
-             "0 = no control, 1 = full control at max acceleration.")]
+             "0 = no control, 1 = full control at max acceleration")]
     public float airTurnControl = 0.25f;
 
     [Tooltip("The character's gravity.")]
     public Vector3 gravity = Vector3.down * 9.81f;
 
-    [Space(15f)]
-    [Tooltip("Character's height when standing.")]
+    [Header("Crouch Settings")]
+    [Tooltip("Character's height when standing")]
     public float standingHeight = 2.0f;
 
-    [Tooltip("Character's height when crouching.")]
+    [Tooltip("Character's height when crouching")]
     public float crouchingHeight = 1.25f;
 
-    [Tooltip("The max speed modifier while crouching.")]
+    [Tooltip("The max speed modifier while crouching")]
     [Range(0.0f, 1.0f)]
     public float crouchSpeedModifier = 0.5f;
 
-    [Tooltip("The max speed modifier while crouching.")]
-    [Range(0.0f, 2.0f)]
-    public float sprintSpeedModifier = 1.5f;
+    [Header("Movement Events")]
+    [Tooltip("Activated once when player is no longer grounded")]
+    public UnityEvent onFalling;
 
-    [Tooltip("Max amount of jumps before having to land")]
-    public int maxJumpCount = 2;
+    [Tooltip("Activated once when player jumps, can be used mid air")]
+    public UnityEvent onJumping;
 
-    [Header("Anim Settings")]
-    [SerializeField]
-    private Animator[] baseAnimals;
+    [Tooltip("Activated once the player inputs movement")]
+    public UnityEvent onMoving;
+
+    [Tooltip("Activated once when player activates sprint")]
+    public UnityEvent onSprinting;
+
+    [Tooltip("Activated once when player crouches")]
+    public UnityEvent onCrouching;
 
     private int currJumpCount = 0;
 
@@ -175,14 +190,11 @@ public class CharController : MonoBehaviour
     #endregion OnEvents
 
     #region Input Methods
-    private float horizontal;
-    private float vertical;
     private void HandleInput()
     {
-        //BUG: Moving player with controller and camera with mouse stutters / stops movement, fixed when using getaxisraw
         //Read Input values
-        //float horizontal = Input.GetAxisRaw($"Horizontal");
-        //float vertical = Input.GetAxisRaw($"Vertical");
+        float horizontal = Input.GetAxisRaw($"Horizontal");
+        float vertical = Input.GetAxisRaw($"Vertical");
 
         // Create a movement direction vector (in world space)
         movementDirection = Vector3.zero;
@@ -195,41 +207,27 @@ public class CharController : MonoBehaviour
         // Make Sure it won't move faster diagonally
         movementDirection = Vector3.ClampMagnitude(movementDirection, 1.0f);
 
+        //baseAnimals[GameManager.GetRaceInt()].SetFloat("Movement", Mathf.Clamp01(movementDirection.magnitude), 0.05f, Time.deltaTime);
         //baseAnimals[GameManager.GetRaceInt()].SetFloat("Movement", );
     }
 
     private void OnMovement(InputValue value)
     {
         Debug.Log("On movement");
+
         //Get Input
-        Vector2 inputPressed = value.Get<Vector2>();
-
-        //Tells Animator that player is moving
-        if(inputPressed.x != 0 || inputPressed.y != 0)
-        {
-            baseAnimals[GameManager.GetRaceInt()].SetBool("isMoving", true);
-            baseAnimals[GameManager.GetRaceInt()].SetFloat("Movement", Mathf.Clamp01(movementDirection.magnitude));
-        }
-        else
-        {
-            baseAnimals[GameManager.GetRaceInt()].SetBool("isMoving", false);
-            baseAnimals[GameManager.GetRaceInt()].SetFloat("Movement", 0);
-        }
-
+        //Vector2 inputPressed = value.Get<Vector2>();
 
         //Read Input values
-        horizontal = inputPressed.x;
-        vertical = inputPressed.y;
+        //horizontal = inputPressed.x;
+        //vertical = inputPressed.y;
     }
 
     private void OnJump()
     {
         Debug.Log("On jump");
         if (currJumpCount < maxJumpCount && !jump)
-        {
             jump = true;
-            baseAnimals[GameManager.GetRaceInt()].SetTrigger("Jump");
-        }
     }
 
     private void OnCrouch()
