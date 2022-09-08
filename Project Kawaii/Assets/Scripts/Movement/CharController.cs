@@ -11,10 +11,21 @@ public class CharController : MonoBehaviour
 {
     #region Variables
     [Header("Base Requirements")]
-    public InputActionAsset inputActions;
+    [Tooltip("Input asset for player control")]
+    [SerializeField]
+    private InputActionAsset inputActions;
 
     [Tooltip("The Player following camera.")]
-    public Camera playerCamera;
+    [SerializeField]
+    private Camera playerCamera;
+
+    [Tooltip("Root gameobject holding inventory UI")]
+    [SerializeField]
+    private GameObject inventoryCanvas;
+
+    [Tooltip("Root gameobject holding pause menu UI")]
+    [SerializeField]
+    private GameObject pauseCanvas;
 
     [Header("Core Movement Settings")]
     [Tooltip("Change in rotation per second (Deg / s)")]
@@ -55,7 +66,6 @@ public class CharController : MonoBehaviour
     [Tooltip("The character's gravity.")]
     public Vector3 gravity = Vector3.down * 9.81f;
 
-    [Header("Crouch Settings")]
     [Tooltip("Character's height when standing")]
     public float standingHeight = 2.0f;
 
@@ -146,7 +156,8 @@ public class CharController : MonoBehaviour
     }
     private void Update()
     {
-        HandleInput();
+        if (!pauseCanvas.activeInHierarchy)
+            HandleInput();
     }
     #endregion Unity Methods
 
@@ -213,7 +224,10 @@ public class CharController : MonoBehaviour
 
     private void OnMovement(InputValue value)
     {
-        Debug.Log("On movement");
+        if (!pauseCanvas.activeInHierarchy)
+        {
+            Debug.Log("On movement");
+        }
 
         //Get Input
         //Vector2 inputPressed = value.Get<Vector2>();
@@ -225,21 +239,50 @@ public class CharController : MonoBehaviour
 
     private void OnJump()
     {
-        Debug.Log("On jump");
-        if (currJumpCount < maxJumpCount && !jump)
-            jump = true;
+        if (!pauseCanvas.activeInHierarchy)
+        {
+            Debug.Log("On jump");
+            if (currJumpCount < maxJumpCount && !jump)
+                jump = true;
+        }
     }
 
     private void OnCrouch()
     {
-        Debug.Log("On crouch");
-        crouch = !crouch;
+        if (!pauseCanvas.activeInHierarchy)
+        {
+            Debug.Log("On crouch");
+            crouch = !crouch;
+        }
     }
 
     private void OnSprint()
     {
-        Debug.Log("On sprint");
-        sprint = !sprint;
+        if (!pauseCanvas.activeInHierarchy)
+        {
+            Debug.Log("On sprint");
+            sprint = !sprint;
+        }
+    }
+
+    private void OnPause()
+    {
+        pauseCanvas.SetActive(!pauseCanvas.activeInHierarchy);
+        switch (Time.timeScale)
+        {
+            case 0:
+                Time.timeScale = 1;
+                break;
+            case 1:
+                Time.timeScale = 0;
+                break;
+        }
+    }
+
+    private void OnOpenInventory()
+    {
+        if(!pauseCanvas.activeInHierarchy)
+            inventoryCanvas.SetActive(!inventoryCanvas.activeInHierarchy);
     }
     #endregion Input Methods
 
