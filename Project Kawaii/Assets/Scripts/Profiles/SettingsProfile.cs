@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.Audio;
+using MikelW.Menus;
 
-namespace MikelW.Menus
+namespace MikelW.Profiles
 {
     #region Volume Class
     /// <summary>

@@ -49,8 +49,14 @@ namespace MikelW.Movement
         [Tooltip("Initial velocity (instantaneous vertical velocity) when jumping")]
         public float jumpImpulse = 6.5f;
 
+        [Tooltip("Initial velocity (instantaneous forward velocity) when dashing")]
+        public float dashImpulse = 5f;
+
         [Tooltip("Max amount of jumps before having to land")]
         public int maxJumpCount = 2;
+
+        [Tooltip("Max amount of jumps before having to land")]
+        public int maxDashCount = 1;
 
         [Tooltip("Friction to apply when falling")]
         public float airFriction = 0.1f;
@@ -71,30 +77,28 @@ namespace MikelW.Movement
         [Tooltip("Character's height when standing")]
         public float standingHeight = 2.0f;
 
-        [Tooltip("Character's height when crouching")]
-        public float crouchingHeight = 1.25f;
-
-        [Tooltip("The max speed modifier while crouching")]
-        [Range(0.0f, 1.0f)]
-        public float crouchSpeedModifier = 0.5f;
-
         [Header("Movement Events")]
-        [Tooltip("Activated once when player is no longer grounded")]
-        public UnityEvent onFalling;
-
         [Tooltip("Activated once when player jumps, can be used mid air")]
         public UnityEvent onJumping;
 
-        [Tooltip("Activated once the player inputs movement")]
+        [Tooltip("Activated when the player inputs movement, will be called every button press")]
         public UnityEvent onMoving;
 
         [Tooltip("Activated once when player activates sprint")]
         public UnityEvent onSprinting;
 
-        [Tooltip("Activated once when player crouches")]
-        public UnityEvent onCrouching;
+        [Tooltip("Activated once when player dashes")]
+        public UnityEvent onDashing;
+
+        [Tooltip("Activated once when player interacts with something")]
+        public UnityEvent onInteract;
+
+        [Tooltip("Activated once when player uses an item")]
+        public UnityEvent onAction;
 
         private int currJumpCount = 0;
+
+        private int currDashCount = 0;
 
         private Coroutine _lateFixedUpdateCoroutine;
 
@@ -104,11 +108,11 @@ namespace MikelW.Movement
 
         public bool jump { get; set; }
 
-        public bool crouch { get; set; }
+        public bool dash { get; set; }
 
         public bool sprint { get; set; }
 
-        public bool isCrouching { get; protected set; }
+        //public bool isCrouching { get; protected set; }
         #endregion Variables
 
         #region Unity Methods
@@ -226,9 +230,10 @@ namespace MikelW.Movement
 
         private void OnMovement(InputValue value)
         {
-            if (!pauseCanvas.activeInHierarchy)
+            if (!pauseCanvas.activeInHierarchy && (value.Get<Vector2>().x != 0 || value.Get<Vector2>().y != 0))
             {
                 Debug.Log("On movement");
+                onMoving.Invoke();
             }
 
             //Get Input
@@ -239,22 +244,35 @@ namespace MikelW.Movement
             //vertical = inputPressed.y;
         }
 
+        private void OnInteract()
+        {
+            Debug.Log("On interact");
+            onInteract.Invoke();
+        }
+
+        private void OnAction()
+        {
+            Debug.Log("On action");
+            onAction.Invoke();
+        }
+
         private void OnJump()
         {
-            if (!pauseCanvas.activeInHierarchy)
+            if (!pauseCanvas.activeInHierarchy && currJumpCount < maxJumpCount && !jump)
             {
+                jump = true;
                 Debug.Log("On jump");
-                if (currJumpCount < maxJumpCount && !jump)
-                    jump = true;
+                onJumping.Invoke();
             }
         }
 
-        private void OnCrouch()
+        private void OnDash()
         {
-            if (!pauseCanvas.activeInHierarchy)
+            if (!pauseCanvas.activeInHierarchy && currDashCount < maxDashCount && !dash)
             {
-                Debug.Log("On crouch");
-                crouch = !crouch;
+                dash = true;
+                Debug.Log("On Dash");
+                onDashing.Invoke();
             }
         }
 
@@ -262,8 +280,9 @@ namespace MikelW.Movement
         {
             if (!pauseCanvas.activeInHierarchy)
             {
-                Debug.Log("On sprint");
                 sprint = !sprint;
+                Debug.Log("On sprint");
+                onSprinting.Invoke();
             }
         }
 
@@ -339,26 +358,22 @@ namespace MikelW.Movement
             characterMovement.velocity = velocity;
         }
 
-        private void Crouching()
+        private void Dashing()
         {
-            if (crouch)
+            if (dash && currDashCount < maxDashCount)
             {
-                if (isCrouching)
-                    return;
+                dash = false;
+                currDashCount++;
 
-                characterMovement.SetHeight(crouchingHeight);
-                isCrouching = true;
-            }
-            else
-            {
-                if (!isCrouching)
-                    return;
-
-                if (!characterMovement.CheckHeight(standingHeight))
+                if (characterMovement.isGrounded)
                 {
-                    characterMovement.SetHeight(standingHeight);
-                    isCrouching = false;
+                    // Pause ground constraint so character can jump off ground
+                    characterMovement.PauseGroundConstraint();
                 }
+
+                // perform the dash
+                Vector3 dashVelocity = (transform.forward * dashImpulse) + (transform.up * (jumpImpulse * 0.2f));
+                characterMovement.LaunchCharacter(dashVelocity, true);
             }
         }
 
@@ -385,20 +400,14 @@ namespace MikelW.Movement
         {
             Jumping();
 
-            Crouching();
+            Dashing();
 
-            //BUG: Need to better control crouch and sprint states
-            //--------------------------------------------------------------------------
             float targetSpeed = 0;
-            //Change speed for crouching
-            if (crouch)
-                targetSpeed = isCrouching ? maxSpeed * crouchSpeedModifier : maxSpeed;
             //Change speed for sprinting
-            else if (sprint)
+            if (sprint)
                 targetSpeed = sprint ? maxSpeed * sprintSpeedModifier : maxSpeed;
             else
                 targetSpeed = maxSpeed;
-            //---------------------------------------------------------------------------
 
 
             // Create our desired velocity using the previously created movement direction vector
@@ -408,6 +417,7 @@ namespace MikelW.Movement
             if (characterMovement.isGrounded)
             {
                 currJumpCount = 0;
+                currDashCount = 0;
                 GroundedMovement(desiredVelocity);
             }
             else
