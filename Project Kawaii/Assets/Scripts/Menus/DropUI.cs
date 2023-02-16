@@ -2,17 +2,20 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
-public class DropUI : MonoBehaviour, IDropHandler
+namespace MikelW.Menus
 {
-    public UnityEvent onDrop;
-
-    public void OnDrop(PointerEventData eventData)
+    public class DropUI : MonoBehaviour, IDropHandler
     {
-        Debug.Log("OnDrop");
-        if(eventData.pointerDrag != null)
+        public UnityEvent onDrop;
+
+        public void OnDrop(PointerEventData eventData)
         {
-            eventData.pointerDrag.GetComponent<RectTransform>().anchoredPosition = GetComponent<RectTransform>().anchoredPosition;
-            onDrop.Invoke();
+            Debug.Log("OnDrop");
+            if (eventData.pointerDrag != null)
+            {
+                eventData.pointerDrag.GetComponent<RectTransform>().anchoredPosition = GetComponent<RectTransform>().anchoredPosition;
+                onDrop.Invoke();
+            }
         }
     }
 }

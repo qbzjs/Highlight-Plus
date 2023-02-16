@@ -1,56 +1,58 @@
 using UnityEngine;
-using MikelW.Menus;
 using TMPro;
 using UnityEngine.UI;
 
-public class SettingsManager : MonoBehaviour
+namespace MikelW.Menus
 {
-    [Header("Settings")]
-    [SerializeField]
-    private TMP_Dropdown quality;
-    [SerializeField]
-    private TMP_Dropdown reso;
-    [SerializeField]
-    private Toggle fsToggle;
-    [SerializeField]
-    private SettingsProfile settingsProfile;
-
-    public static SettingsProfile profile { get; private set; }
-
-    private void Awake()
+    public class SettingsManager : MonoBehaviour
     {
-        if (settingsProfile)
-            profile = settingsProfile;
-        else
-            Debug.LogError("A Profile needs to be added to MainMenuManager script, object: " + gameObject.name);
-    }
+        [Header("Settings")]
+        [SerializeField]
+        private TMP_Dropdown quality;
+        [SerializeField]
+        private TMP_Dropdown reso;
+        [SerializeField]
+        private Toggle fsToggle;
+        [SerializeField]
+        private SettingsProfile settingsProfile;
 
-    private void Start()
-    {
-        SettingsInitialization();
-    }
+        public static SettingsProfile profile { get; private set; }
 
-    private void SettingsInitialization()
-    {
-        //Audio
-        profile.LoadAudioLevels();
+        private void Awake()
+        {
+            if (settingsProfile)
+                profile = settingsProfile;
+            else
+                Debug.LogError("A Profile needs to be added to MainMenuManager script, object: " + gameObject.name);
+        }
 
-        //FullScreen
-        MenuFunctions.PopulateFullscreenToggle(fsToggle);
-        fsToggle.isOn = profile.LoadFullScreen();
-        fsToggle.onValueChanged.AddListener(delegate { profile.SaveFullScreen(fsToggle.isOn); });
-        fsToggle.onValueChanged.AddListener(delegate { MenuFunctions.SetFullScreen(fsToggle.isOn); });
+        private void Start()
+        {
+            SettingsInitialization();
+        }
 
-        //Quality
-        MenuFunctions.PopulateQualityPresetDropdown(quality);
-        quality.value = profile.LoadQuality();
-        quality.onValueChanged.AddListener(delegate { profile.SaveQuality(quality.value); });
-        quality.onValueChanged.AddListener(delegate { MenuFunctions.SetQuality(quality.value); });
+        private void SettingsInitialization()
+        {
+            //Audio
+            profile.LoadAudioLevels();
 
-        //Resolution
-        MenuFunctions.PopulateResolutionDropdown(reso);
-        reso.value = profile.LoadResolution();
-        reso.onValueChanged.AddListener(delegate { profile.SaveResolution(reso.value); });
-        reso.onValueChanged.AddListener(delegate { MenuFunctions.SetResolution(reso.value); });
+            //FullScreen
+            MenuFunctions.PopulateFullscreenToggle(fsToggle);
+            fsToggle.isOn = profile.LoadFullScreen();
+            fsToggle.onValueChanged.AddListener(delegate { profile.SaveFullScreen(fsToggle.isOn); });
+            fsToggle.onValueChanged.AddListener(delegate { MenuFunctions.SetFullScreen(fsToggle.isOn); });
+
+            //Quality
+            MenuFunctions.PopulateQualityPresetDropdown(quality);
+            quality.value = profile.LoadQuality();
+            quality.onValueChanged.AddListener(delegate { profile.SaveQuality(quality.value); });
+            quality.onValueChanged.AddListener(delegate { MenuFunctions.SetQuality(quality.value); });
+
+            //Resolution
+            MenuFunctions.PopulateResolutionDropdown(reso);
+            reso.value = profile.LoadResolution();
+            reso.onValueChanged.AddListener(delegate { profile.SaveResolution(reso.value); });
+            reso.onValueChanged.AddListener(delegate { MenuFunctions.SetResolution(reso.value); });
+        }
     }
 }

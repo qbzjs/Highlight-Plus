@@ -1,37 +1,39 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using MikelW.Menus;
 using MikelW.Statics;
 
-public class Loader : MonoBehaviour
+namespace MikelW.Menus
 {
-    private float timeSpentLoading = 0;
-
-    [SerializeField]
-    private int artificialLoadTime = 3;
-
-    [SerializeField]
-    private TMP_Text textPercentage;
-    [SerializeField]
-    private Image loadingBar;
-
-    private void Start()
+    public class Loader : MonoBehaviour
     {
-        MenuFunctions.LoadScene(StaticData.sceneIndexToLoad);
-        MenuFunctions.SetSceneActivation(false);
-    }
+        private float timeSpentLoading = 0;
 
-    private void Update()
-    {
-        timeSpentLoading += Time.deltaTime;
+        [SerializeField]
+        private int artificialLoadTime = 3;
 
-        textPercentage.text = MenuFunctions.GetLoadPercentage();
-        loadingBar.fillAmount = MenuFunctions.GetLoadProgress();
-        if (loadingBar.fillAmount >= 0.99f && timeSpentLoading >= artificialLoadTime)
+        [SerializeField]
+        private TMP_Text textPercentage;
+        [SerializeField]
+        private Image loadingBar;
+
+        private void Start()
         {
-            Debug.Log("Done loading");
-            MenuFunctions.SetSceneActivation(true);
+            MenuFunctions.LoadScene(StaticData.sceneIndexToLoad);
+            MenuFunctions.SetSceneActivation(false);
+        }
+
+        private void Update()
+        {
+            timeSpentLoading += Time.deltaTime;
+
+            textPercentage.text = MenuFunctions.GetLoadPercentage();
+            loadingBar.fillAmount = MenuFunctions.GetLoadProgress();
+            if (loadingBar.fillAmount >= 0.99f && timeSpentLoading >= artificialLoadTime)
+            {
+                Debug.Log("Done loading");
+                MenuFunctions.SetSceneActivation(true);
+            }
         }
     }
 }

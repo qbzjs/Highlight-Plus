@@ -1,23 +1,26 @@
 using UnityEngine;
 
-public class Fader : MonoBehaviour
+namespace MikelW.Menus
 {
-    private Animator anim;
-
-    private void Awake()
+    public class Fader : MonoBehaviour
     {
-        anim = GetComponent<Animator>();
-    }
+        private Animator anim;
 
-    public void FadeIn()
-    {
-        if (!anim.GetCurrentAnimatorStateInfo(0).IsName("FadeIn"))
-            anim.SetTrigger("In");
-    }
+        private void Awake()
+        {
+            anim = GetComponent<Animator>();
+        }
 
-    public void FadeOut()
-    {
-        if (!anim.GetCurrentAnimatorStateInfo(0).IsName("FadeOut"))
-            anim.SetTrigger("Out");
+        public void FadeIn()
+        {
+            if (!anim.GetCurrentAnimatorStateInfo(0).IsName("FadeIn"))
+                anim.SetTrigger("In");
+        }
+
+        public void FadeOut()
+        {
+            if (!anim.GetCurrentAnimatorStateInfo(0).IsName("FadeOut"))
+                anim.SetTrigger("Out");
+        }
     }
 }

@@ -1,16 +1,19 @@
 using UnityEngine;
 
-public class Rotator : MonoBehaviour
+namespace MikelW.Menus
 {
-    public int rotateSpeed = 30;
-
-    void Update()
+    public class Rotator : MonoBehaviour
     {
-        transform.Rotate(0, rotateSpeed * Time.deltaTime, 0);
-    }
+        public int rotateSpeed = 30;
 
-    public void AdjustActivation()
-    {
-        enabled = !enabled;
+        void Update()
+        {
+            transform.Rotate(0, rotateSpeed * Time.deltaTime, 0);
+        }
+
+        public void AdjustActivation()
+        {
+            enabled = !enabled;
+        }
     }
 }

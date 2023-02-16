@@ -1,6 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MikelW.Profiles;
 
 public class GameManager : MonoBehaviour
 {

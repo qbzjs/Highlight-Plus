@@ -1,7 +1,10 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "MikelW/Create String List")]
-public class StringList : ScriptableObject
+namespace MikelW.Profiles
 {
-    public string[] stringList;
+    [CreateAssetMenu(menuName = "MikelW/Create String List")]
+    public class StringList : ScriptableObject
+    {
+        public string[] stringList;
+    }
 }
