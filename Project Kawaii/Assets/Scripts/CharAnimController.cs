@@ -20,7 +20,7 @@ public class CharAnimController : MonoBehaviour
 
     public void OnAnimChange()
     {
-        anim.SetFloat("Movement", movement);
+        anim.SetFloat("Movement", movement, 0.05f, Time.deltaTime);
         if (jump)
         {
             anim.SetTrigger("Jump");

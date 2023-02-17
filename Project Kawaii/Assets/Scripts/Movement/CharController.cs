@@ -13,6 +13,10 @@ namespace MikelW.Movement
     {
         #region Variables
         [Header("Base Requirements")]
+        [Tooltip("Game Manager script")]
+        [SerializeField]
+        private GameManager gameManager;
+
         [Tooltip("Input asset for player control")]
         [SerializeField]
         private InputActionAsset inputActions;
@@ -102,6 +106,8 @@ namespace MikelW.Movement
 
         private Coroutine _lateFixedUpdateCoroutine;
 
+        private CharAnimController playerAnim;
+
         public CharacterMovement characterMovement { get; private set; }
 
         public Vector3 movementDirection { get; set; }
@@ -123,6 +129,12 @@ namespace MikelW.Movement
 
             // Enable default physic interactions
             characterMovement.enablePhysicsInteraction = true;
+
+        }
+
+        private void Start()
+        {
+            playerAnim = gameManager.GetPlayerObject().GetComponent<CharAnimController>();
         }
 
         private void OnEnable()
@@ -224,8 +236,22 @@ namespace MikelW.Movement
             // Make Sure it won't move faster diagonally
             movementDirection = Vector3.ClampMagnitude(movementDirection, 1.0f);
 
-            //baseAnimals[GameManager.GetRaceInt()].SetFloat("Movement", Mathf.Clamp01(movementDirection.magnitude), 0.05f, Time.deltaTime);
-            //baseAnimals[GameManager.GetRaceInt()].SetFloat("Movement", );
+            // Set Animation Variable
+            if(!sprint)
+            playerAnim.movement = movementDirection.magnitude / 2;
+            else
+                playerAnim.movement = movementDirection.magnitude;
+
+            if (movementDirection.magnitude != 0)
+            {
+                playerAnim.isMoving = true;
+                playerAnim.OnAnimChange();
+            }
+            else
+            {
+                playerAnim.isMoving = false;
+                playerAnim.OnAnimChange();
+            }
         }
 
         private void OnMovement(InputValue value)
@@ -235,13 +261,6 @@ namespace MikelW.Movement
                 Debug.Log("On movement");
                 onMoving.Invoke();
             }
-
-            //Get Input
-            //Vector2 inputPressed = value.Get<Vector2>();
-
-            //Read Input values
-            //horizontal = inputPressed.x;
-            //vertical = inputPressed.y;
         }
 
         private void OnInteract()
@@ -261,6 +280,8 @@ namespace MikelW.Movement
             if (!pauseCanvas.activeInHierarchy && currJumpCount < maxJumpCount && !jump)
             {
                 jump = true;
+                playerAnim.jump = true;
+                playerAnim.OnAnimChange();
                 Debug.Log("On jump");
                 onJumping.Invoke();
             }
@@ -271,6 +292,8 @@ namespace MikelW.Movement
             if (!pauseCanvas.activeInHierarchy && currDashCount < maxDashCount && !dash)
             {
                 dash = true;
+                playerAnim.dash = true;
+                playerAnim.OnAnimChange();
                 Debug.Log("On Dash");
                 onDashing.Invoke();
             }
@@ -412,16 +435,22 @@ namespace MikelW.Movement
 
             // Create our desired velocity using the previously created movement direction vector
             Vector3 desiredVelocity = movementDirection * targetSpeed;
-
+            
             // Update character's velocity based on its grounding status
             if (characterMovement.isGrounded)
             {
+                playerAnim.isGrounded = true;
+                playerAnim.OnAnimChange();
                 currJumpCount = 0;
                 currDashCount = 0;
                 GroundedMovement(desiredVelocity);
             }
             else
+            {
                 NotGroundedMovement(desiredVelocity);
+                playerAnim.isGrounded = false;
+                playerAnim.OnAnimChange();
+            }
 
             // Perform movement using character's current velocity
             characterMovement.Move();

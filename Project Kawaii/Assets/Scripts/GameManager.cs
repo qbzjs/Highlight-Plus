@@ -50,6 +50,11 @@ public class GameManager : MonoBehaviour
         return raceInt;
     }
 
+    public GameObject GetPlayerObject()
+    {
+        return baseAnimals[raceInt];
+    }
+
     public void SaveCustomization()
     {
         playerProfile.SaveNameString(charName);
