@@ -1,0 +1,3 @@
+Item = No in-world appearance, only exists in inventory / as data (Food, Water, Potions)
+Equipment = Can have in-world appearance but isn't required, adds stats to player (Hat, Rings)
+Tool = MUST have in-world appearance, causes an action and uses a skill(Sword, Axe, Hoe)

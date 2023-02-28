@@ -18,6 +18,9 @@ public class CharAnimController : MonoBehaviour
         OnAnimChange();
     }
 
+    /// <summary>
+    /// Function Called When Animation Parameters Are Changed
+    /// </summary>
     public void OnAnimChange()
     {
         anim.SetFloat("Movement", movement, 0.05f, Time.deltaTime);

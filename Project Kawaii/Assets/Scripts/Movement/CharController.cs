@@ -130,6 +130,7 @@ namespace MikelW.Movement
             // Enable default physic interactions
             characterMovement.enablePhysicsInteraction = true;
 
+            Cursor.lockState = CursorLockMode.Locked;
         }
 
         private void Start()
@@ -316,9 +317,11 @@ namespace MikelW.Movement
             {
                 case 0:
                     Time.timeScale = 1;
+                    Cursor.lockState = CursorLockMode.Locked;
                     break;
                 case 1:
                     Time.timeScale = 0;
+                    Cursor.lockState = CursorLockMode.None;
                     break;
             }
         }
@@ -326,7 +329,13 @@ namespace MikelW.Movement
         private void OnOpenInventory()
         {
             if (!pauseCanvas.activeInHierarchy)
+            {
                 inventoryCanvas.SetActive(!inventoryCanvas.activeInHierarchy);
+                Cursor.lockState = CursorLockMode.None;
+            }
+
+            if(!inventoryCanvas.activeInHierarchy)
+                Cursor.lockState = CursorLockMode.Locked;
         }
         #endregion Input Methods
 
