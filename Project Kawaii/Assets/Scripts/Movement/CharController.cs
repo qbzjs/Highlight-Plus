@@ -17,6 +17,10 @@ namespace MikelW.Movement
         [SerializeField]
         private GameManager gameManager;
 
+        [Tooltip("Interaction System Component to detect / handle all interactions")]
+        [SerializeField]
+        private InteractionSystem interactSystem;
+
         [Tooltip("Input asset for player control")]
         [SerializeField]
         private InputActionAsset inputActions;
@@ -268,6 +272,7 @@ namespace MikelW.Movement
         {
             Debug.Log("On interact");
             onInteract.Invoke();
+            interactSystem.Interact();
         }
 
         private void OnAction()
