@@ -1,20 +1,23 @@
 using UnityEngine;
 using TMPro;
 
-public class HoverUI : MonoBehaviour
+namespace MikelW.GUI
 {
-    public static string SetText;
-
-    [SerializeField]
-    private TMP_Text textUI;
-
-    private void Update()
+    public class HoverUI : MonoBehaviour
     {
-        if (SetText != "")
+        public static string SetText;
+
+        [SerializeField]
+        private TMP_Text textUI;
+
+        private void Update()
         {
-            textUI.text = SetText;
+            if (SetText != "")
+            {
+                textUI.text = SetText;
+            }
+            else
+                textUI.text = "";
         }
-        else
-            textUI.text = "";
     }
 }

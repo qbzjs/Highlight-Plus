@@ -1,4 +1,4 @@
-namespace MikelW.Statics
+namespace MikelW.Data
 {
     public static class StaticData
     {

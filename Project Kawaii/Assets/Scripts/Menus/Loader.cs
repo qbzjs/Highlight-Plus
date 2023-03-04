@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using MikelW.Statics;
+using MikelW.Data;
 
 namespace MikelW.Menus
 {

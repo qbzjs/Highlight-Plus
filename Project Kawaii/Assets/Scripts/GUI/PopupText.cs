@@ -4,95 +4,101 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-[RequireComponent(typeof(TextMeshProUGUI))]
-public class PopupText : MonoBehaviour
+namespace MikelW.GUI
 {
-    public float TimerForMessages;
-    private bool cStarted;
-    private TextMeshProUGUI TextMesh;
-    private List<string> MessagesToDo;
-    public static string ScreenText = "";
-    public Image Main;
-    public Image BG;
-
-    void Start()
+    [RequireComponent(typeof(TextMeshProUGUI))]
+    public class PopupText : MonoBehaviour
     {
-        MessagesToDo = new List<string>(new string[0]);
-        TextMesh = GetComponent<TextMeshProUGUI>();
-        TextMesh.text = "";
-    }
+        [Tooltip("Images for text such as a panel or icon")]
+        public Image main;
 
-    void Update()
-    {
-        HandleText();
-    }
+        [Tooltip("Images for text such as a panel or icon")]
+        public Image background;
 
-    private void HandleText()
-    {
-        if (ScreenText != "")
+        public static string screenText = "";
+
+        private float timerForMessages;
+        private bool cStarted;
+        private List<string> messagesToDo;
+
+        private TextMeshProUGUI textMesh;
+        private Animator textAnimator;
+
+        void Start()
         {
-            MessagesToDo.Add(ScreenText);
-            ScreenText = "";
-        }
-        if (cStarted == false && MessagesToDo.Count > 0)
-        {
-            StartCoroutine(SetText());
-            if (Main != null)
-                Main.enabled = true;
-            if (BG != null)
-                BG.enabled = true;
-        }
-        else if (MessagesToDo.Count <= 0)
-        {
-            if (Main != null)
-                Main.enabled = false;
-            if (BG != null)
-                BG.enabled = false;
+            messagesToDo = new List<string>(new string[0]);
+            textMesh = GetComponent<TextMeshProUGUI>();
+            textAnimator = GetComponent<Animator>();
+            textMesh.text = "";
+            timerForMessages = textAnimator.GetCurrentAnimatorClipInfo(0)[0].clip.length;
         }
 
-        if(TextMesh.text != "")
+        void Update()
         {
-            if (Main != null)
-                Main.enabled = true;
-            if (BG != null)
-                BG.enabled = true;
-        }
-        else
-        {
-            if (Main != null)
-                Main.enabled = false;
-            if (BG != null)
-                BG.enabled = false;
+            HandleText();
         }
 
-    }
-
-    IEnumerator SetText()
-    {
-        //Prevent Multiple Coroutines from running
-        cStarted = true;
-        for (int i = 0; i < MessagesToDo.Count; i++)
+        private void HandleText()
         {
-            //Setting text to oldest (first) message
-            TextMesh.text = MessagesToDo[0];
-            //Wait time between messages
-            yield return new WaitForSeconds(TimerForMessages);
-            //Removes Shown Message
-            MessagesToDo.Remove(MessagesToDo[0]);
-            //Check if there's any messages left
-            if (MessagesToDo.Count > 0)
+            if (screenText != "")
             {
-                TextMesh.text = MessagesToDo[0];
+                messagesToDo.Add(screenText);
+                screenText = "";
             }
-            //Checking if last message and making sure it has a timer before breaking out of loop
-            //if (i == MessagesToDo.Count - 1 && MessagesToDo.Count > 0)
-            //{
-            //    yield return new WaitForSeconds(TimerForMessages);
-            //}
+            if (cStarted == false && messagesToDo.Count > 0)
+            {
+                StartCoroutine(SetText());
+                if (main != null)
+                    main.enabled = true;
+                if (background != null)
+                    background.enabled = true;
+            }
+            else if (messagesToDo.Count <= 0)
+            {
+                if (main != null)
+                    main.enabled = false;
+                if (background != null)
+                    background.enabled = false;
+            }
+
+            if (textMesh.text != "")
+            {
+                if (main != null)
+                    main.enabled = true;
+                if (background != null)
+                    background.enabled = true;
+            }
+            else
+            {
+                if (main != null)
+                    main.enabled = false;
+                if (background != null)
+                    background.enabled = false;
+            }
+
         }
-        //Setting the text back to blank
-        TextMesh.text = "";
-        //Allows the next to start
-        cStarted = false;
+
+        IEnumerator SetText()
+        {
+            //Prevent Multiple Coroutines from running
+            cStarted = true;
+            for (int i = 0; i < messagesToDo.Count; i++)
+            {
+                //Sets text back to empty to avoid animation issues
+                textMesh.text = "";
+                //Trigger default text animation
+                textAnimator.SetTrigger("Default");
+                //Setting text to oldest (first) message
+                textMesh.text = messagesToDo[0];
+                //Wait time between messages
+                yield return new WaitForSeconds(timerForMessages);
+                //Removes shown message
+                messagesToDo.Remove(messagesToDo[0]);
+            }
+            //Setting the text back to blank
+            textMesh.text = "";
+            //Allows the next to start
+            cStarted = false;
+        }
     }
 }
