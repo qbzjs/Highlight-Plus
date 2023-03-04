@@ -1,74 +1,77 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-/// <summary>
-/// Class To Detect Collision Based On Layers
-/// </summary>
-public class CollisionSensor : MonoBehaviour
+namespace MikelW.World
 {
-    #region Variables
     /// <summary>
-    /// The Layers This Sensor Detects
+    /// Class To Detect Collision Based On Layers
     /// </summary>
-    [SerializeField] LayerMask layers;
-
-    /// <summary>
-    /// The Amount Of Colliders This Object Is Around
-    /// </summary>
-    private int colCount = 0;
-
-    /// <summary>
-    /// How Long This Sensor Should Ignore Collision
-    /// </summary>
-    private float disableTimer;
-
-    /// <summary>
-    /// The Colliders This Sensor Is Currently Touching
-    /// </summary>
-    [HideInInspector] public List<Collider> cols;
-    #endregion Variables
-
-    #region Unity Methods
-    private void OnEnable()
+    public class CollisionSensor : MonoBehaviour
     {
-        colCount = 0;
-    }
+        #region Variables
+        /// <summary>
+        /// The Layers This Sensor Detects
+        /// </summary>
+        [SerializeField] LayerMask layers;
 
-    void Update()
-    {
-        disableTimer -= Time.deltaTime;
-    }
+        /// <summary>
+        /// The Amount Of Colliders This Object Is Around
+        /// </summary>
+        private int colCount = 0;
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (((1 << other.gameObject.layer) & layers) != 0)
+        /// <summary>
+        /// How Long This Sensor Should Ignore Collision
+        /// </summary>
+        private float disableTimer;
+
+        /// <summary>
+        /// The Colliders This Sensor Is Currently Touching
+        /// </summary>
+        [HideInInspector] public List<Collider> cols;
+        #endregion Variables
+
+        #region Unity Methods
+        private void OnEnable()
         {
-            colCount++;
-            cols.Add(other);
+            colCount = 0;
         }
-    }
 
-    private void OnTriggerExit(Collider other)
-    {
-        if (((1 << other.gameObject.layer) & layers) != 0)
+        void Update()
         {
-            colCount--;
-            cols.Remove(other);
+            disableTimer -= Time.deltaTime;
         }
-    }
-    #endregion Unity Methods
 
-    #region Public Methods
-    public bool IsCollided()
-    {
-        if (disableTimer > 0)
-            return false;
-        return colCount > 0;
-    }
+        private void OnTriggerEnter(Collider other)
+        {
+            if (((1 << other.gameObject.layer) & layers) != 0)
+            {
+                colCount++;
+                cols.Add(other);
+            }
+        }
 
-    public void Disable(float duration)
-    {
-        disableTimer = duration;
+        private void OnTriggerExit(Collider other)
+        {
+            if (((1 << other.gameObject.layer) & layers) != 0)
+            {
+                colCount--;
+                cols.Remove(other);
+            }
+        }
+        #endregion Unity Methods
+
+        #region Public Methods
+        public bool IsCollided()
+        {
+            if (disableTimer > 0)
+                return false;
+            return colCount > 0;
+        }
+
+        public void Disable(float duration)
+        {
+            disableTimer = duration;
+        }
+        #endregion Public Methods
     }
-    #endregion Public Methods
 }

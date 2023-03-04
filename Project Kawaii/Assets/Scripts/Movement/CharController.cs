@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using MikelW.Data;
+using MikelW.World.Interactions;
 
 namespace MikelW.Movement
 {

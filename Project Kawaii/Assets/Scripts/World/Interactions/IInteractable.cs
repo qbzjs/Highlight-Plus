@@ -1,7 +1,10 @@
-public interface IInteractable
+namespace MikelW.World.Interactions
 {
-    public bool canInteract { get; set; }
+    public interface IInteractable
+    {
+        public bool canInteract { get; set; }
 
-    public void Interaction();
-    public void ResetInteraction();
+        public void Interaction();
+        public void ResetInteraction();
+    }
 }
