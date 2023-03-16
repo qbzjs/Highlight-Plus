@@ -31,6 +31,11 @@ namespace HighlightPlus {
         Never = 2
     }
 
+    public enum OverlayMode {
+        WhenHighlighted = 0,
+        Always = 10
+    }
+
     public enum QualityLevel {
         Fastest = 0,
         High = 1,
@@ -197,6 +202,7 @@ namespace HighlightPlus {
         [Range(0, 1)]
         [Tooltip("Intensity of the overlay effect. A value of 0 disables the overlay completely.")]
         public float overlay;
+        public OverlayMode overlayMode = OverlayMode.WhenHighlighted;
         [ColorUsage(true, true)] public Color overlayColor = Color.yellow;
         public float overlayAnimationSpeed = 1f;
         [Range(0, 1)]
@@ -362,6 +368,12 @@ namespace HighlightPlus {
         public bool staticChildren;
 #endif
 
+        /// <summary>
+        /// Returns true if the renderer for this gameobject is visible by any camera
+        /// </summary>
+        [NonSerialized]
+        public bool isVisible;
+
         [NonSerialized]
         public Transform target;
 
@@ -399,6 +411,7 @@ namespace HighlightPlus {
         float fadeStartTime;
         FadingState fading = FadingState.NoFading;
         CommandBuffer cbHighlight;
+        bool cbHighlightEmpty;
         int[] mipGlowBuffers, mipOutlineBuffers;
         int glowRT, outlineRT;
         static Mesh quadMesh, cubeMesh;
@@ -457,6 +470,7 @@ namespace HighlightPlus {
             if (corners == null || corners.Length != 8) {
                 corners = new Vector4[8];
             }
+            InitCommandBuffer();
             if (quadMesh == null) {
                 BuildQuad();
             }
@@ -547,7 +561,7 @@ namespace HighlightPlus {
                 combinedMeshes.Remove(combinedMeshesHashId);
             }
 
-            foreach(Mesh instancedMesh in instancedMeshes) {
+            foreach (Mesh instancedMesh in instancedMeshes) {
                 if (instancedMesh == null) continue;
                 int usageCount;
                 if (sharedMeshUsage.TryGetValue(instancedMesh, out usageCount)) {
@@ -565,6 +579,20 @@ namespace HighlightPlus {
             SetupMaterial();
         }
 
+
+        private void OnBecameVisible() {
+            isVisible = true;
+        }
+
+        private void OnBecameInvisible() {
+            if (rms == null || rms.Length != 1 || rms[0].transform != transform) {
+                // if effect group doesn't include exactly one object and this object is this same gameobject
+                // ignore this optimization
+                isVisible = true;
+            } else {
+                isVisible = false;
+            }
+        }
 
         /// <summary>
         /// Loads a profile into this effect
@@ -618,7 +646,7 @@ namespace HighlightPlus {
             this.depthAttachmentBuffer = depthAttachmentBuffer;
             this.FullScreenBlit = fullScreenBlit;
             BuildCommandBuffer(cam, clearStencil);
-            return cbHighlight;
+            return cbHighlightEmpty ? null : cbHighlight;
         }
 
         void BuildCommandBuffer(Camera cam, bool clearStencil) {
@@ -630,27 +658,12 @@ namespace HighlightPlus {
                 depthAttachmentBuffer = BuiltinRenderTextureType.CameraTarget;
             }
 
-            if (cam == null || cbHighlight == null) return;
-
-            cbHighlight.Clear();
+            InitCommandBuffer();
 
 #if UNITY_EDITOR
             if (!previewInEditor && !Application.isPlaying) {
                 return;
             }
-#endif
-
-            if (!reflectionProbes && cam.cameraType == CameraType.Reflection)
-                return;
-
-#if UNITY_2022_1_OR_NEWER
-            // depth priming might have changed depth render target so we ensure it's set to normal
-            colorAttachmentBuffer = new RenderTargetIdentifier(colorAttachmentBuffer, 0, CubemapFace.Unknown, -1);
-            depthAttachmentBuffer = new RenderTargetIdentifier(depthAttachmentBuffer, 0, CubemapFace.Unknown, -1);
-            cbHighlight.SetRenderTarget(colorAttachmentBuffer, depthAttachmentBuffer);
-#elif UNITY_2021_2_OR_NEWER
-            var useDepthRenderBuffer = colorAttachmentBuffer != BuiltinRenderTextureType.CameraTarget && depthAttachmentBuffer == BuiltinRenderTextureType.CameraTarget;
-            cbHighlight.SetRenderTarget(colorAttachmentBuffer, useDepthRenderBuffer ? colorAttachmentBuffer : depthAttachmentBuffer);
 #endif
 
             if (requireUpdateMaterial) {
@@ -660,12 +673,14 @@ namespace HighlightPlus {
 
             bool independentFullScreenNotExecuted = true;
             if (clearStencil) {
+                ConfigureOutput();
                 cbHighlight.DrawMesh(quadMesh, matrix4x4Identity, fxMatClearStencil, 0, 0);
                 independentFullScreenNotExecuted = false;
             }
 
             bool seeThroughReal = seeThroughIntensity > 0 && (seeThrough == SeeThroughMode.AlwaysWhenOccluded || (seeThrough == SeeThroughMode.WhenHighlighted && _highlighted));
             if (seeThroughReal) {
+                ConfigureOutput();
                 seeThroughReal = RenderSeeThroughOccluders(cbHighlight, cam);
                 if (seeThroughReal && seeThroughOccluderMask != -1) {
                     if (seeThroughOccluderMaskAccurate) {
@@ -676,8 +691,16 @@ namespace HighlightPlus {
                 }
             }
 
-            if (!_highlighted && !seeThroughReal && !hitActive) {
+            bool showOverlay = hitActive || overlayMode == OverlayMode.Always;
+            if (!_highlighted && !seeThroughReal && !showOverlay) {
                 return;
+            }
+
+            ConfigureOutput();
+
+            if (rms == null) {
+                SetupMaterial();
+                if (rms == null) return;
             }
 
             // Check camera culling mask
@@ -826,7 +849,7 @@ namespace HighlightPlus {
                 }
 
 
-                if (_highlighted || hitActive) {
+                if (_highlighted || showOverlay) {
                     // Hit FX
                     Color overlayColor = this.overlayColor;
                     float overlayMinIntensity = this.overlayMinIntensity;
@@ -1552,15 +1575,16 @@ namespace HighlightPlus {
         /// Sets target for highlight effects
         /// </summary>
         public void SetTarget(Transform transform) {
-            if (transform == target || transform == null)
-                return;
-
-            if (_highlighted) {
-                ImmediateFadeOut();
+            if (transform == null) return;
+            if (transform != target) {
+                if (_highlighted) {
+                    ImmediateFadeOut();
+                }
+                target = transform;
+                SetupMaterial();
+            } else {
+                UpdateVisibilityState();
             }
-
-            target = transform;
-            SetupMaterial();
         }
 
 
@@ -1712,21 +1736,22 @@ namespace HighlightPlus {
             if (rms == null || rms.Length < rr.Length) {
                 rms = new ModelMaterials[rr.Length];
             }
+            InitCommandBuffer();
 
             rmsCount = 0;
             for (int k = 0; k < rr.Length; k++) {
                 rms[rmsCount].Init();
                 Renderer renderer = rr[k];
+                if (renderer == null) continue;
                 if (effectGroup != TargetOptions.OnlyThisObject && !string.IsNullOrEmpty(effectNameFilter)) {
                     if (!renderer.name.Contains(effectNameFilter)) continue;
                 }
                 rms[rmsCount].renderer = renderer;
                 rms[rmsCount].renderWasVisibleDuringSetup = renderer.isVisible;
 
-
                 if (renderer.transform != target) {
                     HighlightEffect otherEffect = renderer.GetComponent<HighlightEffect>();
-                    if (otherEffect != null && otherEffect.enabled) {
+                    if (otherEffect != null && otherEffect.enabled && otherEffect.ignore) {
                         continue; // independent subobject
                     }
                 }
@@ -1742,7 +1767,6 @@ namespace HighlightPlus {
                 bool isSkinnedMesh = renderer is SkinnedMeshRenderer;
                 rms[rmsCount].isSkinnedMesh = isSkinnedMesh;
                 rms[rmsCount].normalsOption = isSkinnedMesh ? NormalsOption.PreserveOriginal : normalsOption;
-                CheckCommandBuffers();
                 if (isSkinnedMesh) {
                     // ignore cloth skinned renderers
                     rms[rmsCount].isSkinnedMesh = true;
@@ -1854,13 +1878,40 @@ namespace HighlightPlus {
             InitMaterial(ref fxMatClearStencil, "HighlightPlus/ClearStencil");
         }
 
-        void CheckCommandBuffers() {
+        void InitCommandBuffer() {
             if (cbHighlight == null) {
                 cbHighlight = new CommandBuffer();
                 cbHighlight.name = "Highlight Plus for " + name;
             }
+            cbHighlightEmpty = true;
         }
 
+
+        void ConfigureOutput() {
+            if (!cbHighlightEmpty) return;
+            cbHighlightEmpty = false;
+
+            cbHighlight.Clear();
+#if UNITY_2022_1_OR_NEWER
+            // depth priming might have changed depth render target so we ensure it's set to normal
+            colorAttachmentBuffer = new RenderTargetIdentifier(colorAttachmentBuffer, 0, CubemapFace.Unknown, -1);
+            depthAttachmentBuffer = new RenderTargetIdentifier(depthAttachmentBuffer, 0, CubemapFace.Unknown, -1);
+            cbHighlight.SetRenderTarget(colorAttachmentBuffer, depthAttachmentBuffer);
+#elif UNITY_2021_2_OR_NEWER
+            var useDepthRenderBuffer = colorAttachmentBuffer != BuiltinRenderTextureType.CameraTarget && depthAttachmentBuffer == BuiltinRenderTextureType.CameraTarget;
+            cbHighlight.SetRenderTarget(colorAttachmentBuffer, useDepthRenderBuffer ? colorAttachmentBuffer : depthAttachmentBuffer);
+#endif
+        }
+
+        public void UpdateVisibilityState() {
+            // isVisible only accounts for cases where there's a single object managed by the highlight effect
+            // and that object can receive OnBecameVisible/OnBecameInvisible. Otherwise we can't use this optimization
+            if (rms == null || rms.Length != 1 || rms[0].transform != transform || rms[0].renderer == null) {
+                isVisible = true;
+            } else if (rms[0].renderer != null) {
+                isVisible = rms[0].renderer.isVisible;
+            }
+        }
 
         public void UpdateMaterialProperties() {
 
@@ -1870,6 +1921,8 @@ namespace HighlightPlus {
             if (ignore) {
                 _highlighted = false;
             }
+
+            UpdateVisibilityState();
 
             maskRequired = (_highlighted && (outline > 0 || (glow > 0 && !glowIgnoreMask))) || seeThrough != SeeThroughMode.Never || (targetFX && targetFXAlignToGround);
 
@@ -2509,6 +2562,26 @@ namespace HighlightPlus {
             }
             foreach (Mesh mesh in reorientedMeshes.Values) {
                 if (mesh != null) DestroyImmediate(mesh);
+            }
+        }
+
+        /// <summary>
+        /// Clears cached meshes only for the highlighted objects
+        /// </summary>
+        void ClearCachedMeshes() {
+            if (combinedMeshes.TryGetValue(combinedMeshesHashId, out Mesh combinedMesh)) {
+                DestroyImmediate(combinedMesh);
+                combinedMeshes.Remove(combinedMeshesHashId);
+            }
+            if (rms == null) return;
+            for (int k = 0; k < rms.Length; k++) {
+                Mesh mesh = rms[k].mesh;
+                if (mesh != null) {
+                    if (smoothMeshes.ContainsValue(mesh) || reorientedMeshes.ContainsValue(mesh)) {
+                        DestroyImmediate(mesh);
+                    }
+                }
+
             }
         }
         #endregion

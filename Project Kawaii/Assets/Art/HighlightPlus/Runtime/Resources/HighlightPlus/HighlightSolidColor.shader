@@ -30,7 +30,7 @@ Properties {
             #include "UnityCG.cginc"
             #include "CustomVertexTransform.cginc"
 
-            sampler _MainTex;
+            sampler2D _MainTex;
             #if HP_DEPTHCLIP
                 UNITY_DECLARE_DEPTH_TEXTURE(_CameraDepthTexture);
             #endif

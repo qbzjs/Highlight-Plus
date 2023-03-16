@@ -58,7 +58,7 @@ Properties {
             float3 _Glow2; // x = outline width, y = glow speed, z = dither on/off
             float _ConstantWidth;
 	        fixed _CutOff;
-            sampler _MainTex;
+            sampler2D _MainTex;
       		float4 _MainTex_ST;
 			float4 _MainTex_TexelSize;
 

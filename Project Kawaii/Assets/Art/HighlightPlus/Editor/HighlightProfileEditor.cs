@@ -8,7 +8,7 @@ namespace HighlightPlus {
     public class HighlightProfileEditor : Editor {
 
         SerializedProperty effectGroup, effectGroupLayer, effectNameFilter, combineMeshes, alphaCutOff, cullBackFaces;
-        SerializedProperty overlay, overlayColor, overlayAnimationSpeed, overlayMinIntensity, overlayTexture, overlayTextureScale, overlayBlending;
+        SerializedProperty overlay, overlayMode, overlayColor, overlayAnimationSpeed, overlayMinIntensity, overlayTexture, overlayTextureScale, overlayBlending;
         SerializedProperty fadeInDuration, fadeOutDuration, constantWidth, normalsOption;
         SerializedProperty outline, outlineColor, outlineWidth, outlineQuality, outlineDownsampling, outlineVisibility, outlineIndependent;
         SerializedProperty glow, glowWidth, glowQuality, glowDownsampling, glowHQColor, glowDithering, glowMagicNumber1, glowMagicNumber2, glowAnimationSpeed;
@@ -33,6 +33,7 @@ namespace HighlightPlus {
             fadeOutDuration = serializedObject.FindProperty("fadeOutDuration");
             constantWidth = serializedObject.FindProperty("constantWidth");
             overlay = serializedObject.FindProperty("overlay");
+            overlayMode = serializedObject.FindProperty("overlayMode");
             overlayColor = serializedObject.FindProperty("overlayColor");
             overlayAnimationSpeed = serializedObject.FindProperty("overlayAnimationSpeed");
             overlayMinIntensity = serializedObject.FindProperty("overlayMinIntensity");
@@ -205,6 +206,7 @@ namespace HighlightPlus {
             DrawSectionField(overlay, "Overlay", overlay.floatValue > 0);
             if (overlay.floatValue > 0) {
                 EditorGUI.indentLevel++;
+                EditorGUILayout.PropertyField(overlayMode, new GUIContent("Mode"));
                 EditorGUILayout.PropertyField(overlayColor, new GUIContent("Color"));
                 EditorGUILayout.PropertyField(overlayTexture, new GUIContent("Texture"));
                 if (overlayTexture.objectReferenceValue != null) {

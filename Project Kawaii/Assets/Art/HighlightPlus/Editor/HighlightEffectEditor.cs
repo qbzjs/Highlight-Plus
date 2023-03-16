@@ -15,7 +15,7 @@ namespace HighlightPlus {
         SerializedProperty profile, profileSync, camerasLayerMask, ignoreObjectVisibility, reflectionProbes, GPUInstancing;
         SerializedProperty ignore, previewInEditor, effectGroup, effectGroupLayer, effectNameFilter, combineMeshes, alphaCutOff, cullBackFaces, normalsOption;
         SerializedProperty highlighted, fadeInDuration, fadeOutDuration, flipY, constantWidth, subMeshMask;
-        SerializedProperty overlay, overlayColor, overlayAnimationSpeed, overlayMinIntensity, overlayBlending, overlayTexture, overlayTextureScale;
+        SerializedProperty overlay, overlayMode, overlayColor, overlayAnimationSpeed, overlayMinIntensity, overlayBlending, overlayTexture, overlayTextureScale;
         SerializedProperty outline, outlineColor, outlineWidth, outlineQuality, outlineDownsampling, outlineVisibility, outlineBlitDebug, outlineIndependent;
         SerializedProperty glow, glowWidth, glowQuality, glowDownsampling, glowHQColor, glowDithering, glowMagicNumber1, glowMagicNumber2, glowAnimationSpeed;
         SerializedProperty glowBlendPasses, glowPasses, glowVisibility, glowBlendMode, glowBlitDebug, glowIgnoreMask;
@@ -62,6 +62,7 @@ namespace HighlightPlus {
             constantWidth = serializedObject.FindProperty("constantWidth");
             subMeshMask = serializedObject.FindProperty("subMeshMask");
             overlay = serializedObject.FindProperty("overlay");
+            overlayMode = serializedObject.FindProperty("overlayMode");
             overlayColor = serializedObject.FindProperty("overlayColor");
             overlayAnimationSpeed = serializedObject.FindProperty("overlayAnimationSpeed");
             overlayMinIntensity = serializedObject.FindProperty("overlayMinIntensity");
@@ -419,6 +420,7 @@ namespace HighlightPlus {
                 DrawSectionField(overlay, "Overlay", overlay.floatValue > 0);
                 if (overlay.floatValue > 0) {
                     EditorGUI.indentLevel++;
+                    EditorGUILayout.PropertyField(overlayMode, new GUIContent("Mode"));
                     EditorGUILayout.PropertyField(overlayColor, new GUIContent("Color"));
                     EditorGUILayout.PropertyField(overlayTexture, new GUIContent("Texture"));
                     if (overlayTexture.objectReferenceValue != null) {

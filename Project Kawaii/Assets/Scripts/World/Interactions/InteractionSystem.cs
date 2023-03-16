@@ -14,6 +14,8 @@ namespace MikelW.World.Interactions
         [SerializeField]
         private LayerMask layerToHit;
 
+        public static bool canInteract = true;
+
         private bool hitDetected;
         private RaycastHit rayHit;
 
@@ -26,7 +28,7 @@ namespace MikelW.World.Interactions
         {
             hitDetected = Physics.BoxCast(col.bounds.center - (transform.forward / 2), transform.localScale / 2, transform.forward, out rayHit, transform.rotation, distance, layerToHit);
 
-            if (hitDetected && rayHit.transform.GetComponent<IInteractable>().canInteract)
+            if (hitDetected && rayHit.transform.GetComponent<IInteractable>().canInteract && canInteract)
                 HoverUI.SetText = "Interact with: " + rayHit.transform.gameObject.name + " ? ";
             else
                 HoverUI.SetText = "";
@@ -59,7 +61,7 @@ namespace MikelW.World.Interactions
         {
             Debug.Log("Called for an interaction");
 
-            if (Physics.BoxCast(col.bounds.center - (transform.forward / 2), transform.localScale / 2, transform.forward, out rayHit, transform.rotation, distance, layerToHit))
+            if (Physics.BoxCast(col.bounds.center - (transform.forward / 2), transform.localScale / 2, transform.forward, out rayHit, transform.rotation, distance, layerToHit) && canInteract)
             {
                 Debug.Log("Ray Hit:" + rayHit.transform.gameObject.name);
 
@@ -68,7 +70,7 @@ namespace MikelW.World.Interactions
                 if (hitInteraction.canInteract)
                     rayHit.transform.GetComponent<IInteractable>().Interaction();
             }
-            else
+            else if(canInteract == true)
                 Debug.LogWarning("Didn't hit anything with interaction");
         }
     }

@@ -59,10 +59,11 @@ namespace HighlightPlus {
 
             public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData) {
                 int count = HighlightEffect.effects.Count;
-		if (count == 0) return;
+                if (count == 0) return;
 
                 Camera cam = renderingData.cameraData.camera;
                 int camLayer = 1 << cam.gameObject.layer;
+                CameraType camType = cam.cameraType;
 
 #if UNITY_2022_1_OR_NEWER
                 RTHandle cameraColorTarget = renderer.cameraColorTargetHandle;
@@ -77,22 +78,31 @@ namespace HighlightPlus {
                     cameraDepthTarget = cameraColorTarget;
                 }
 #endif
+
                 if (!HighlightEffect.customSorting && (Time.frameCount % 10 == 0 || !Application.isPlaying)) {
                     effectDistanceComparer.camPos = cam.transform.position;
                     HighlightEffect.effects.Sort(effectDistanceComparer);
                 }
 
                 bool clearStencil = this.clearStencil;
+
                 for (int k = 0; k < count; k++) {
                     HighlightEffect effect = HighlightEffect.effects[k];
-                    if (effect.isActiveAndEnabled) {
-                        if ((effect.camerasLayerMask & camLayer) == 0) continue;
-                        CommandBuffer cb = effect.GetCommandBuffer(cam, cameraColorTarget, cameraDepthTarget, fullScreenBlitMethod, clearStencil);
-                        if (cb != null) {
-                            context.ExecuteCommandBuffer(cb);
-                            clearStencil = false;
-                        }
+
+                    if (!(effect.ignoreObjectVisibility || effect.isVisible)) continue;
+
+                    if (!effect.isActiveAndEnabled) continue;
+
+                    if (camType == CameraType.Reflection && !effect.reflectionProbes) continue;
+
+                    if ((effect.camerasLayerMask & camLayer) == 0) continue;
+
+                    CommandBuffer cb = effect.GetCommandBuffer(cam, cameraColorTarget, cameraDepthTarget, fullScreenBlitMethod, clearStencil);
+                    if (cb != null) {
+                        context.ExecuteCommandBuffer(cb);
+                        clearStencil = false;
                     }
+
                 }
             }
 

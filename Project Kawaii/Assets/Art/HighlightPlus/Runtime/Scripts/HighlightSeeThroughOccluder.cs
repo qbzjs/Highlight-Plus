@@ -10,12 +10,19 @@ namespace HighlightPlus {
         public int subMeshCount;
     }
 
+    public enum OccluderMode {
+        BlocksSeeThrough,
+        TriggersSeeThrough
+    }
+
     public enum DetectionMethod {
         Stencil = 0,
         RayCast = 1
     }
 	[ExecuteInEditMode]
 	public class HighlightSeeThroughOccluder : MonoBehaviour {
+
+        public OccluderMode mode = OccluderMode.BlocksSeeThrough;
 
         public DetectionMethod detectionMethod = DetectionMethod.Stencil;
 
@@ -42,7 +49,7 @@ namespace HighlightPlus {
             } else {
                 rr.Clear();
             }
-            GetComponentsInChildren<Renderer>(rr);
+            GetComponentsInChildren(rr);
             int rrCount = rr.Count;
             meshData = new MeshData[rrCount];
             for (int k = 0; k < rrCount; k++) {

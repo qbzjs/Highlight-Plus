@@ -10,7 +10,7 @@ namespace HighlightPlus {
 
         static readonly List<HighlightSeeThroughOccluder> occluders = new List<HighlightSeeThroughOccluder>();
         static readonly Dictionary<Camera, int> occludersFrameCount = new Dictionary<Camera, int>();
-        static Material fxMatOccluder;
+        static Material fxMatSeeThroughOccluder, fxMatDepthWrite;
         static RaycastHit[] hits;
         static Collider[] colliders;
 
@@ -91,23 +91,28 @@ namespace HighlightPlus {
             if (currentFrameCount == lastFrameCount) return true;
             occludersFrameCount[cam] = currentFrameCount;
 
-            if (fxMatOccluder == null) {
-                InitMaterial(ref fxMatOccluder, "HighlightPlus/Geometry/SeeThroughOccluder");
-                if (fxMatOccluder == null) return true;
+            if (fxMatSeeThroughOccluder == null) {
+                InitMaterial(ref fxMatSeeThroughOccluder, "HighlightPlus/Geometry/SeeThroughOccluder");
+                if (fxMatSeeThroughOccluder == null) return true;
+            }
+            if (fxMatDepthWrite == null) {
+                InitMaterial(ref fxMatDepthWrite, "HighlightPlus/Geometry/JustDepth");
+                if (fxMatDepthWrite == null) return true;
             }
 
             for (int k = 0; k < occludersCount; k++) {
                 HighlightSeeThroughOccluder occluder = occluders[k];
                 if (occluder == null || !occluder.isActiveAndEnabled) continue;
                 if (occluder.detectionMethod == DetectionMethod.Stencil) {
-                    if (occluder.meshData == null || occluder.meshData.Length == 0) continue;
+                    if (occluder.meshData == null) continue;
+                    int meshDataLength = occluder.meshData.Length;
                     // Per renderer
-                    for (int m = 0; m < occluder.meshData.Length; m++) {
+                    for (int m = 0; m < meshDataLength; m++) {
                         // Per submesh
                         Renderer renderer = occluder.meshData[m].renderer;
                         if (renderer.isVisible) {
                             for (int s = 0; s < occluder.meshData[m].subMeshCount; s++) {
-                                cb.DrawRenderer(renderer, fxMatOccluder, s);
+                                cb.DrawRenderer(renderer, occluder.mode == OccluderMode.BlocksSeeThrough ? fxMatSeeThroughOccluder : fxMatDepthWrite, s);
                             }
                         }
                     }
@@ -130,7 +135,7 @@ namespace HighlightPlus {
             occlusionData.checkLastTime = now;
             occlusionData.occlusionRenderFrame = frameCount;
 
-            if (rms.Length == 0 || rms[0].renderer == null) return false;
+            if (rms == null || rms.Length == 0 || rms[0].renderer == null) return false;
 
             Vector3 camPos = cam.transform.position;
             Quaternion quaternionIdentity = Quaternion.identity;

@@ -90,6 +90,16 @@ Version history
 ---------------
 
 Current version
+- Highlight See Through Occluder: added mode for triggering the see-through offect on sprites and transparent objects
+- Performance optimizations when using a high number of Highlight Effect components in the scene
+- [Fix] Fixed shader compatibility issue on PS4
+
+Version 9.3
+- Overlay: added "Mode" option (only when highlighted or always)
+- Nested highlight effects are now included unless the 'Ignore' option is selected
+- Cached meshes are now reconstructed when calling the Refresh() method
+
+Version 9.2
 - Improved shared mesh cache handling
 - Improved see-through camera-layer based detection
 

@@ -124,6 +124,8 @@ namespace MikelW.Movement
 
         public bool sprint { get; set; }
 
+        public static bool canMove = true;
+
         //public bool isCrouching { get; protected set; }
         #endregion Variables
 
@@ -181,8 +183,15 @@ namespace MikelW.Movement
         }
         private void Update()
         {
-            if (!pauseCanvas.activeInHierarchy)
+            if (!pauseCanvas.activeInHierarchy && canMove)
                 HandleInput();
+            else
+            {
+                movementDirection = new Vector3(0, 0, 0);
+                playerAnim.movement = 0;
+                playerAnim.isMoving = false;
+                playerAnim.OnAnimChange();
+            }
         }
         #endregion Unity Methods
 
@@ -285,7 +294,7 @@ namespace MikelW.Movement
 
         private void OnJump()
         {
-            if (!pauseCanvas.activeInHierarchy && currJumpCount < maxJumpCount && !jump)
+            if (!pauseCanvas.activeInHierarchy && currJumpCount < maxJumpCount && !jump && canMove)
             {
                 jump = true;
                 playerAnim.jump = true;
@@ -297,7 +306,7 @@ namespace MikelW.Movement
 
         private void OnDash()
         {
-            if (!pauseCanvas.activeInHierarchy && currDashCount < maxDashCount && !dash)
+            if (!pauseCanvas.activeInHierarchy && currDashCount < maxDashCount && !dash && canMove)
             {
                 dash = true;
                 playerAnim.dash = true;

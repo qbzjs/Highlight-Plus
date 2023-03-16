@@ -46,7 +46,7 @@ namespace HighlightPlus {
         [Range(0, 1)]
         [Tooltip("Intensity of the overlay effect. A value of 0 disables the overlay completely.")]
         public float overlay;
-
+        public OverlayMode overlayMode = OverlayMode.WhenHighlighted;
         [ColorUsage(true, true)] public Color overlayColor = Color.yellow;
         public float overlayAnimationSpeed = 1f;
 
@@ -175,6 +175,7 @@ namespace HighlightPlus {
             effect.cameraDistanceFadeNear = cameraDistanceFadeNear;
             effect.constantWidth = constantWidth;
             effect.overlay = overlay;
+            effect.overlayMode = overlayMode;
             effect.overlayColor = overlayColor;
             effect.overlayAnimationSpeed = overlayAnimationSpeed;
             effect.overlayMinIntensity = overlayMinIntensity;
@@ -260,6 +261,7 @@ namespace HighlightPlus {
             cameraDistanceFadeNear = effect.cameraDistanceFadeNear;
             constantWidth = effect.constantWidth;
             overlay = effect.overlay;
+            overlayMode = effect.overlayMode;
             overlayColor = effect.overlayColor;
             overlayAnimationSpeed = effect.overlayAnimationSpeed;
             overlayMinIntensity = effect.overlayMinIntensity;

@@ -34,7 +34,7 @@ Properties {
             #include "UnityCG.cginc"
             #include "CustomVertexTransform.cginc"
 
-            sampler _MainTex;
+            sampler2D _MainTex;
       		float4 _MainTex_ST;
 			float4 _MainTex_TexelSize;
             fixed _CutOff;

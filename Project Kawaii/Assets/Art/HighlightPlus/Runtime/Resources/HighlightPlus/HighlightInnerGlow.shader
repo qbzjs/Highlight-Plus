@@ -52,7 +52,7 @@ Properties {
 				UNITY_VERTEX_OUTPUT_STEREO
             };
             
-            sampler _MainTex;
+            sampler2D _MainTex;
             float4 _MainTex_ST;
             fixed _CutOff;
       		fixed4 _InnerGlowColor;
